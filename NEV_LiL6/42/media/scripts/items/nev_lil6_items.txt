@@ -1,0 +1,57 @@
+module NEV_LiL6
+{
+    imports
+    {
+        Base
+    }
+
+    /* L6 traction battery (51 kWh). Occupies the vanilla "Battery" part; must
+       be drainable for BaseVehicle.getBatteryCharge() (DESIGN 3.1). No
+       base:carbattery tag: vanilla battery chargers / recipes must not take it.
+       Weight = capacity x 0.8, rounded, at most 40 (51 kWh -> 40), carried in
+       both hands like the vanilla generator (DESIGN 9, REVIEW D4, user
+       2026-10-07; cap: DESIGN 5.3, REVIEW U8, the heaviest vanilla item). SelfTest item-weights checks it against
+       NEVLib.Battery.itemWeight(cfg). */
+    item TractionBattery
+    {
+        DisplayCategory = VehicleMaintenance,
+        Weight = 40.0,
+        RequiresEquippedBothHands = true,
+        Tags = base:heavyitem,
+        ItemType = base:drainable,
+        UseDelta = 0.00001,
+        UseWhileEquipped = false,
+        Icon = CarBattery,
+        cantBeConsolided = true,
+        ConditionMax = 100,
+        ChanceToSpawnDamaged = 10,
+        MechanicsItem = true,
+        WorldStaticModel = CarBattery,
+        KeepOnDeplete = true,
+    }
+
+    /* L6 trunk and glove box (nev_lil6.txt; the vanilla type-1 parts are 55 / 3) */
+    item LiL6Trunk
+    {
+        DisplayCategory = VehicleMaintenance,
+        Weight = 35.0,
+        ItemType = base:normal,
+        Icon = CarTrunk,
+        MaxCapacity = 100,
+        ConditionAffectsCapacity = true,
+        ConditionMax = 100,
+        ChanceToSpawnDamaged = 100,
+        MechanicsItem = true,
+    }
+
+    item LiL6GloveBox
+    {
+        DisplayCategory = VehicleMaintenance,
+        Weight = 3.0,
+        ItemType = base:normal,
+        Icon = GloveBox,
+        MaxCapacity = 10,
+        ConditionMax = 100,
+        MechanicsItem = true,
+    }
+}

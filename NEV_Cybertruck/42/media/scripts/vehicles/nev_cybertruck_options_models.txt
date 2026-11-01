@@ -1,0 +1,109 @@
+module Base
+{
+    /* NEV_Cybertruck armour / add-on part models (#273; docs/vehicles/cybertruck/art/armor-record-c4.md, B3 black steel). Rebuild:
+       bash art/vehicles/cybertruck/options/build_c4.sh v9 && bash art/vehicles/cybertruck/options/build_int.sh v9 &&
+       python art/vehicles/cybertruck/options/install_int.py v9. Same mesh units and scale as nev_cybertruck_models.txt.
+       Parts that move with a door / the hood / the tailgate use the vehicle shader: their texels sit in the body atlas
+       (nev_cybertruck_shell_*; the engine binds the car's skin for every vehicle-shader part). A bull bar is ONE part with two
+       models: the upper block (Default, skinned to the hood / tailgate bone, the part's parent is EngineDoor / TrunkDoor so it is
+       drawn by that door's animation player) and the lower block (Lower, static, also in the body atlas - L6 #210: a mesh skinned
+       to body_bone drawn by a door's player lands turned 180 deg, so the part's fixed section is a second static model).
+       Parts that never move use vehiclewheel + their own texture nev_cybertruck_options (vehiclewheel gets no bone palette).
+       Tire guards: origin = wheel centre like the wheel meshes, the parts say wheel = <W> so the engine draws them with the wheel
+       (position, suspension, steering, spin; pickup-armor-design 5.4); L / R like CT_wheel_L / _R, front and rear share them. */
+    model NEV_Cybertruck_OptDoorArmorFL
+    {
+        mesh = vehicles/NEV_Cybertruck_Options|CT_opt_door_armor_fl,
+        shader = vehicle_multiuv_noreflect,
+        static = false,
+        boneWeight = door_fl_bone 1.0,
+        scale = 0.000494505495,
+    }
+    model NEV_Cybertruck_OptDoorArmorFR
+    {
+        mesh = vehicles/NEV_Cybertruck_Options|CT_opt_door_armor_fr,
+        shader = vehicle_multiuv_noreflect,
+        static = false,
+        boneWeight = door_fr_bone 1.0,
+        scale = 0.000494505495,
+    }
+    model NEV_Cybertruck_OptDoorArmorRL
+    {
+        mesh = vehicles/NEV_Cybertruck_Options|CT_opt_door_armor_rl,
+        shader = vehicle_multiuv_noreflect,
+        static = false,
+        boneWeight = door_rl_bone 1.0,
+        scale = 0.000494505495,
+    }
+    model NEV_Cybertruck_OptDoorArmorRR
+    {
+        mesh = vehicles/NEV_Cybertruck_Options|CT_opt_door_armor_rr,
+        shader = vehicle_multiuv_noreflect,
+        static = false,
+        boneWeight = door_rr_bone 1.0,
+        scale = 0.000494505495,
+    }
+    model NEV_Cybertruck_OptBullbarFront
+    {
+        mesh = vehicles/NEV_Cybertruck_Options|CT_opt_bullbar_front,
+        shader = vehicle_multiuv_noreflect,
+        static = false,
+        boneWeight = hood_bone 1.0,
+        scale = 0.000494505495,
+    }
+    model NEV_Cybertruck_OptBullbarFrontLower
+    {
+        mesh = vehicles/NEV_Cybertruck_Options|CT_opt_bullbar_front_lower,
+        shader = vehicle_norandom_multiuv_noreflect,
+        scale = 0.000494505495,
+    }
+    model NEV_Cybertruck_OptBullbarRear
+    {
+        mesh = vehicles/NEV_Cybertruck_Options|CT_opt_bullbar_rear,
+        shader = vehicle_multiuv_noreflect,
+        static = false,
+        boneWeight = trunk_bone 1.0,
+        scale = 0.000494505495,
+    }
+    model NEV_Cybertruck_OptBullbarRearLower
+    {
+        mesh = vehicles/NEV_Cybertruck_Options|CT_opt_bullbar_rear_lower,
+        shader = vehicle_norandom_multiuv_noreflect,
+        scale = 0.000494505495,
+    }
+    model NEV_Cybertruck_OptWindshieldFront
+    {
+        mesh = vehicles/NEV_Cybertruck_Options|CT_opt_windshield_front,
+        texture = Vehicles/nev_cybertruck_options,
+        shader = vehiclewheel,
+        scale = 0.000494505495,
+    }
+    model NEV_Cybertruck_OptWindshieldRear
+    {
+        mesh = vehicles/NEV_Cybertruck_Options|CT_opt_windshield_rear,
+        texture = Vehicles/nev_cybertruck_options,
+        shader = vehiclewheel,
+        scale = 0.000494505495,
+    }
+    model NEV_Cybertruck_OptRoofRack
+    {
+        mesh = vehicles/NEV_Cybertruck_Options|CT_opt_roofrack,
+        texture = Vehicles/nev_cybertruck_options,
+        shader = vehiclewheel,
+        scale = 0.000494505495,
+    }
+    model NEV_Cybertruck_OptTireGuardL
+    {
+        mesh = vehicles/NEV_Cybertruck_Options|CT_opt_tire_guard_L,
+        texture = Vehicles/nev_cybertruck_options,
+        shader = vehiclewheel,
+        scale = 0.000494505495,
+    }
+    model NEV_Cybertruck_OptTireGuardR
+    {
+        mesh = vehicles/NEV_Cybertruck_Options|CT_opt_tire_guard_R,
+        texture = Vehicles/nev_cybertruck_options,
+        shader = vehiclewheel,
+        scale = 0.000494505495,
+    }
+}

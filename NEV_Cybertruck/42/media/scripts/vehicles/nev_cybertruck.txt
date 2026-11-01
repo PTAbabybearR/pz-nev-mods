@@ -1,0 +1,1869 @@
+module Base
+{
+    /* Tesla Cybertruck, Premium All-Wheel Drive (BEV pickup; ships with v2.0 - the pack carries
+       UNRELEASED.txt until then). Body: the art pass (docs/art/CT-*), written into this file by
+       art/common/vehicle/build_mod.py from art/vehicles/cybertruck/car.json; numbers docs/vehicles/cybertruck/design/stats-design.md
+       (DESIGN 5.1 / 5.4 / 5.5). Derived from nev_lil6.txt (NEW-CAR-CHECKLIST 2-2). Differences to the vanilla
+       templates:
+       - traction battery in the "Battery" part (drainable, specificItem = false): the library's BEV ones
+       - "Engine" part = drive motor; its update keeps part updates alive
+       - no GasTank, no range extender, no fridge (the real car has none), no muffler; engineLoudness 0
+       - single-speed drive: gearRatioCount 1 + NEVLib rpm script NEVLib_EV
+       - TrunkDoor carries two models: the tailgate and the tonneau cover (hidden while open, #238) */
+    vehicle NEV_Cybertruck
+    {
+        /* 2: the pickup class (DESIGN 5.4 P2); vanilla type-2 parts throughout (DESIGN 9.1 revision 17) */
+        mechanicType = 2,
+        engineRepairLevel = 5,
+        playerDamageProtection = 1.3,
+        /* DESIGN 5.5 off-road ruler: full-time AWD with front and rear lockers = the locker tier, grass / road
+           1.66 like part-time / low-range 4WD (#242, user 10-16); measured 1.696 at 0.975 (tools/perf_rulers.py) */
+        offRoadEfficiency = 0.975,
+        /* stainless + 8 Tesla wrap colours, one picked per new car: stainless 90 %, the wraps the rare tier (Register.lua rarePaints, DESIGN 10.1a) */
+        skin
+        {
+            texture = Vehicles/nev_cybertruck_shell_stainless,
+        }
+        skin
+        {
+            texture = Vehicles/nev_cybertruck_shell_stealth_black,
+        }
+        skin
+        {
+            texture = Vehicles/nev_cybertruck_shell_dark_grey,
+        }
+        skin
+        {
+            texture = Vehicles/nev_cybertruck_shell_abyss_blue,
+        }
+        skin
+        {
+            texture = Vehicles/nev_cybertruck_shell_forest_green,
+        }
+        skin
+        {
+            texture = Vehicles/nev_cybertruck_shell_tactical_green,
+        }
+        skin
+        {
+            texture = Vehicles/nev_cybertruck_shell_crimson_red,
+        }
+        skin
+        {
+            texture = Vehicles/nev_cybertruck_shell_copper_tint,
+        }
+        skin
+        {
+            texture = Vehicles/nev_cybertruck_shell_rose_gold,
+        }
+        textureMask = Vehicles/nev_cybertruck_mask,
+        textureLights = Vehicles/nev_cybertruck_lights,
+        textureDamage1Overlay = Vehicles/nev_cybertruck_blood_mask,
+        textureDamage2Overlay = Vehicles/nev_cybertruck_blood,
+        textureDamage1Shell = Vehicles/nev_cybertruck_damage1,
+        textureDamage2Shell = Vehicles/nev_cybertruck_damage2,
+        textureRust = Vehicles/nev_cybertruck_rust,
+        textureShadow = Vehicles/nev_cybertruck_shadow,
+        model
+        {
+            file = NEV_Cybertruck,
+            scale = 1.82,
+            /* #368 C4 (DESIGN 5.4, revision 43): the origin (the centre of mass when the car uses box physics) lowered -
+               this offset and the 4 physics boxes + 0.085 (15.5 cm) together, so the body, wheels, parts and
+               ground clearance stay where they were (#368 C3 offset list: h0 unchanged) */
+            offset = 0 0.4360 0,
+        }
+        sound
+        {
+            alarmLoop = VehicleAlarmA VehicleAlarmB VehicleAlarmC VehicleAlarmD VehicleAlarmE,
+            /* silent motor (NEVLib nev_sounds.txt); the range extender plays the
+               vanilla generator loop from NEVLib/RexSound.lua (D1, 2026-10-08) */
+            engine = NEVLibSilent,
+            engineStart = NEVLibSilent,
+            engineTurnOff = NEVLibSilent,
+            horn = VehicleHornStandard,
+            ignitionFail = VehicleIgnitionFailSUV,
+        }
+        extents = 1.0328 0.6374 2.7917,
+        /* DESIGN 5.5 ruler (revision 43, #368 C4): real 3009 kg x k 0.30 (tools/perf_rulers.py) */
+        mass = 903,
+        physicsChassisShape = 1.0328 0.6374 2.7917,
+        /* box branch: only the spawn height and the shadow (VehicleScript, #368 C3 offset list); the reference car's ratio */
+        centerOfMassOffset = 0.0 0.1504 0.0,
+        /* DESIGN 5.5 (revision 43, #368 C4; handling-rulers-design.md 16.2): calibrated on 0-100 - target 6.5 s
+           (user 10-26: 6-8 s), measured 6.36-6.38 s at mass 903 (#368 C4 self check;
+           tools/perf_rulers.py accel). Saved with the car: new cars only (9240 before #368) */
+        engineForce = 7080,
+        gearRatioCount = 1,
+        engineRPMType = NEVLib_EV,
+        /* DESIGN 5.5 (#368 C4, user 2026-10-28 "both agreed"): 130 for every NEV - the steering of the user's reference
+           car (Mustang UBC: clamp 0.3 + 0.6 x (1 - speed / 130), wheel rate 1 - speed / runtime top speed). The speed the
+           car reaches is the ruler's: Register.lua driveMaxKmh 90 is set as the runtime top speed while the throttle is
+           down (NEVLib Parts.applyLimp) -> game about 109.8. Read from the script on load */
+        maxSpeed = 130.0,
+        /* DESIGN 5.5 reverse (#368 C4): the Mustang's 30 (vanilla default 40) - reverse holds at about 20 km/h
+           (CarController:744-748: speed x 1.5 against -maxSpeedReverse). Read from the script on load */
+        maxSpeedReverse = 30.0,
+        engineLoudness = 0,
+        engineQuality = 100,
+        /* not parsed by VehicleScript (VEHICLE-ATTRS 0.2): braking = the brake parts */
+        brakingForce = 48,
+        stoppingMovementForce = 4.0,
+        /* I-242 (player report on v1.0.0, fixed in v1.0.2): with 1.0 a fast turn pushed the outer wheels past the
+           physics' suspension force limit (it grows with the total mass: 1150 + cargo), the body dropped onto the
+           ground and the turn counted as a crash. 0.5 held in the whole speed x steering matrix, empty and fully
+           loaded, both sides (docs/testing/sharp-turn-test-design.md 5); vanilla heavy vehicles also lower it (PickUpVan 0.6).
+           Cybertruck: full load is always >= 1100 (DESIGN 5.4 P6 before the pickup class's 0.6-1.0). User 10-19: the
+           full load (every container but the driver's seat, all add-ons) estimated 1794 -> tier 1800 = 0.35
+           (tools/perf_rulers.py; #271 measures it).
+           #368 (DESIGN 5.4 P6 revision 41): the roll follows the top speed (driveMaxKmh, #368 C4) - 90 is in the band 0.95-1.0, the top
+           1.0 (pickup class 0.6-1.0, no exception any more); the full load is checked against M_pass.
+           #368 C4 (revision 43, 16.2): the band from 0.80, the value the reference car's 0.98 (the user's trial);
+           full load at top speed, steering full (#368 formal measurement): the body box scrapes the ground at 1666 /
+           1690 kg (no damage), clear at 0.90 - M_pass open, the value waits for the user (#368) */
+        rollInfluence = 0.98,
+        steeringIncrement = 0.04,
+        steeringClamp = 0.3,
+        /* #368 C4 (DESIGN 5.4, revision 43; user 10-29: C4 accepted): the reference car's suspension (Mustang UBC,
+           69fordMustangUBC.txt) - rest length and travel in the same game metres (x its scale / ours), stiffness /
+           compression / damping copied. wheelFriction and brakingForce are not parsed (VEHICLE-ATTRS 0.2: the tyre
+           and brake parts decide), copied with it */
+        suspensionStiffness = 37,
+        suspensionCompression = 4.83,
+        suspensionDamping = 3.88,
+        maxSuspensionTravelCm = 7.154,
+        suspensionRestLength = 0.1022,
+        wheelFriction = 1.75,
+        /* no front / rear end durability: the engine does not parse frontEndHealth, and the real key
+           (frontEndDurability) is only a counter - parts are damaged anyway (BaseVehicle.addDamageFront).
+           Removed in v1.0.3 (DESIGN 5.2, user 10-13 A2); a sturdier front comes from armour (PARTS). */
+        seats = 5,
+        wheel FrontLeft
+        {
+            front = true,
+            offset = 0.4161 -0.3626 1.0005,
+            radius = 0.2172,
+            width = 0.1409,
+        }
+        wheel FrontRight
+        {
+            front = true,
+            offset = -0.4161 -0.3626 1.0005,
+            radius = 0.2172,
+            width = 0.1409,
+        }
+        wheel RearLeft
+        {
+            front = false,
+            offset = 0.4161 -0.3626 -0.797,
+            radius = 0.2172,
+            width = 0.1409,
+        }
+        wheel RearRight
+        {
+            front = false,
+            offset = -0.4161 -0.3626 -0.797,
+            radius = 0.2172,
+            width = 0.1409,
+        }
+        area Engine
+        {
+            xywh = 0.0 1.6321 1.0328 0.4725,
+        }
+        area TruckBed
+        {
+            xywh = 0.0 -1.6321 1.0328 0.4725,
+        }
+        area TireFrontLeft
+        {
+            xywh = 0.7527 1.0005 0.4725 0.4725,
+        }
+        area TireFrontRight
+        {
+            xywh = -0.7527 1.0005 0.4725 0.4725,
+        }
+        area TireRearLeft
+        {
+            xywh = 0.7527 -0.797 0.4725 0.4725,
+        }
+        area TireRearRight
+        {
+            xywh = -0.7527 -0.797 0.4725 0.4725,
+        }
+        /* Charging port on the left rear, where the real car has it (#303, user 10-18: every NEV's port sits where
+           the real car's does; car.json charge_port). A charger must be within 2 tiles of its centre, like
+           vanilla refuelling (NEVLib.Charging). */
+        area ChargePort
+        {
+            xywh = 0.7527 -0.797 0.4725 0.4725,
+        }
+        template = TrunkDoor,
+        template = Trunk/part/TruckBed,
+        template = Seat/part/SeatFrontLeft,
+        template = Seat/part/SeatFrontRight,
+        template = Seat/part/SeatRearLeft,
+        template = Seat/part/SeatRearRight,
+        template = Battery,
+        template = Engine,
+        template = EngineDoor,
+        template = Heater,
+        template = Windshield/part/Windshield,
+        template = Windshield/part/WindshieldRear,
+        template = Window/part/WindowFrontLeft,
+        template = Window/part/WindowFrontRight,
+        template = Window/part/WindowRearLeft,
+        template = Window/part/WindowRearRight,
+        template = Door/part/DoorFrontLeft,
+        template = Door/part/DoorFrontRight,
+        template = Door/part/DoorRearLeft,
+        template = Door/part/DoorRearRight,
+        template = Tire,
+        template = Brake,
+        template = Suspension,
+        template = Radio,
+        template = Headlight,
+        /* BEGIN visual part lines (model names: art/vehicles/cybertruck/car.json "models") */
+        part DoorFrontLeft
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_DoorFL,
+            }
+            anim Open
+            {
+                anim = door_fl_open,
+                rate = 1.0,
+            }
+            anim Close
+            {
+                anim = door_fl_open,
+                reverse = true,
+                rate = 1.5,
+            }
+            anim Opened
+            {
+                anim = door_fl_open,
+                reverse = true,
+                animate = false,
+            }
+            anim Closed
+            {
+                anim = door_fl_open,
+                animate = false,
+            }
+        }
+        part DoorFrontRight
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_DoorFR,
+            }
+            anim Open
+            {
+                anim = door_fr_open,
+                rate = 1.0,
+            }
+            anim Close
+            {
+                anim = door_fr_open,
+                reverse = true,
+                rate = 1.5,
+            }
+            anim Opened
+            {
+                anim = door_fr_open,
+                reverse = true,
+                animate = false,
+            }
+            anim Closed
+            {
+                anim = door_fr_open,
+                animate = false,
+            }
+        }
+        part DoorRearLeft
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_DoorRL,
+            }
+            anim Open
+            {
+                anim = door_rl_open,
+                rate = 1.0,
+            }
+            anim Close
+            {
+                anim = door_rl_open,
+                reverse = true,
+                rate = 1.5,
+            }
+            anim Opened
+            {
+                anim = door_rl_open,
+                reverse = true,
+                animate = false,
+            }
+            anim Closed
+            {
+                anim = door_rl_open,
+                animate = false,
+            }
+        }
+        part DoorRearRight
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_DoorRR,
+            }
+            anim Open
+            {
+                anim = door_rr_open,
+                rate = 1.0,
+            }
+            anim Close
+            {
+                anim = door_rr_open,
+                reverse = true,
+                rate = 1.5,
+            }
+            anim Opened
+            {
+                anim = door_rr_open,
+                reverse = true,
+                animate = false,
+            }
+            anim Closed
+            {
+                anim = door_rr_open,
+                animate = false,
+            }
+        }
+        part EngineDoor
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_Hood,
+            }
+            anim Open
+            {
+                anim = hood_open,
+                rate = 1.0,
+            }
+            anim Close
+            {
+                anim = hood_open,
+                reverse = true,
+                rate = 1.5,
+            }
+            anim Opened
+            {
+                anim = hood_open,
+                reverse = true,
+                animate = false,
+            }
+            anim Closed
+            {
+                anim = hood_open,
+                animate = false,
+            }
+        }
+        part TrunkDoor
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_Tailgate,
+            }
+            /* rates halved (#249): the TonneauCover part below plays this part's animation player (parent = TrunkDoor,
+               BaseVehicle.ModelInfo.getAnimationPlayer) and the engine updates that player once per model using it
+               (BaseVehicle.postupdate), so with the cover shown the track runs twice as fast: 0.5 / 0.75 = the old
+               1.0 / 1.5 */
+            anim Open
+            {
+                anim = trunk_open,
+                rate = 0.5,
+            }
+            anim Close
+            {
+                anim = trunk_open,
+                reverse = true,
+                rate = 0.75,
+            }
+            anim Opened
+            {
+                anim = trunk_open,
+                reverse = true,
+                animate = false,
+            }
+            anim Closed
+            {
+                anim = trunk_open,
+                animate = false,
+            }
+        }
+        /* the tonneau cover (#249, user 2026-10-17: it slides forward into the front of the bed as the tailgate opens,
+           like the real car): its own part so that it plays the tailgate's trunk_open (the engine animates only a
+           part's first model; a child part uses its parent's animation player). Its 9 strips are on their own bones
+           (art/vehicles/cybertruck/gen/rig_ct.py), weighted by the tailgate model (nev_cybertruck_models.txt). No item: the
+           mechanics window does not list it (nodisplay) and NEVLib shows its model while the tailgate is fitted
+           (Register.lua hideWhenOpen showOpen; vanilla shows a part's models only when an item is set). */
+        part TonneauCover
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_Tonneau,
+            }
+            parent = TrunkDoor,
+            category = nodisplay,
+        }
+        part WindowFrontLeft
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_WindowFL,
+            }
+            anim ClosedToOpen
+            {
+                anim = window_fl_open,
+                animate = false,
+            }
+            window
+            {
+                openable = true,
+            }
+        }
+        part WindowFrontRight
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_WindowFR,
+            }
+            anim ClosedToOpen
+            {
+                anim = window_fr_open,
+                animate = false,
+            }
+            window
+            {
+                openable = true,
+            }
+        }
+        part WindowRearLeft
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_WindowRL,
+            }
+            anim ClosedToOpen
+            {
+                anim = window_rl_open,
+                animate = false,
+            }
+            window
+            {
+                openable = true,
+            }
+        }
+        part WindowRearRight
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_WindowRR,
+            }
+            anim ClosedToOpen
+            {
+                anim = window_rr_open,
+                animate = false,
+            }
+            window
+            {
+                openable = true,
+            }
+        }
+        part Windshield
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_Windshield,
+            }
+        }
+        part WindshieldRear
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_WindshieldRear,
+            }
+        }
+        part SeatFrontLeft
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_SeatFL,
+            }
+        }
+        part SeatFrontRight
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_SeatFR,
+            }
+        }
+        part NEVSeatRearMiddle
+        {
+            category = seat,
+            itemType = Base.NormalCarSeat,
+            mechanicRequireKey = true,
+            durability = 3,
+            mechanicArea = Interior,
+            area = SeatRearLeft,
+            container
+            {
+                seat = RearMiddle,
+                test = Vehicles.ContainerAccess.Seat,
+                soundMap = ContainerPut VehicleCarseatTransferItem,
+                soundMap = ContainerTake VehicleCarseatTransferItem,
+            }
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 300,
+                skills = Mechanics:2,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.InstallTest.Default,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 300,
+                skills = Mechanics:2,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                requireEmpty = true,
+            }
+            lua
+            {
+                create = Vehicles.Create.Default,
+            }
+        }
+        /* Glove box: vanilla's GloveBox template (template_glovebox.txt) written out here instead of
+           "template = GloveBox", so the part comes after the 5th seat (NEVSeatRearMiddle) - the loot window lists
+           container buttons in part order and a template part sits before every part defined in the body (#302,
+           as the L6 #250). Saved cars match parts by id (VehicleParts.setScript). itemType stays Base.GloveBox: the
+           car's mechanicType 2 makes it Base.GloveBox2 (specificItem not set), as before. */
+        part GloveBox
+        {
+            mechanicArea = Interior,
+            area = SeatFrontRight,
+            itemType = Base.GloveBox,
+            mechanicRequireKey = true,
+            durability = 3,
+            container
+            {
+                test = Vehicles.ContainerAccess.GloveBox,
+                soundMap = ContainerClose VehicleGloveboxClose,
+                soundMap = ContainerOpen VehicleGloveboxOpen,
+                soundMap = ContainerPut VehicleGloveboxTransferItem,
+                soundMap = ContainerTake VehicleGloveboxTransferItem,
+            }
+            lua
+            {
+                create = Vehicles.Create.Default,
+            }
+        }
+        /* the library's frunk (#306, docs/design/parts/frunk-design.md): after the glove box (#304 R1). A template's parts
+           are added where the line is written (VehicleScript.Load walks the block's elements in order), so the line
+           sits here, after the glove box written out above (#302), not up with the other templates. */
+        template = NEVFrunk,
+        part TireFrontLeft
+        {
+            model InflatedTirePlusWheel
+            {
+                file = NEV_Cybertruck_WheelL,
+            }
+        }
+        part TireFrontRight
+        {
+            model InflatedTirePlusWheel
+            {
+                file = NEV_Cybertruck_WheelR,
+            }
+        }
+        part TireRearLeft
+        {
+            model InflatedTirePlusWheel
+            {
+                file = NEV_Cybertruck_WheelL,
+            }
+        }
+        part TireRearRight
+        {
+            model InflatedTirePlusWheel
+            {
+                file = NEV_Cybertruck_WheelR,
+            }
+        }
+        /* END C: visual part lines */
+        part Radio
+        {
+            /* infotainment screen instead of a radio (docs/design/cabin/tv-design.md);
+               part id stays "Radio" so the vanilla dashboard button and
+               device menu keep working */
+            specificItem = false,
+            itemType = NEVLib.InfotainmentScreen;NEVLib.InfotainmentScreenRadio,
+            mechanicArea = SeatFrontLeft,
+            area = SeatFrontLeft,
+            /* sandbox InfotainmentTV off -> radio only (DESIGN 7.5):
+               re-applied on every load and after an install. A "table"
+               merges key by key into the template's, but a "lua" block
+               replaces the template's whole block (server self test
+               screen-hooks), so vanilla's create is repeated; the update
+               wraps vanilla's (screen power, DESIGN 5.3). */
+            table install
+            {
+                complete = NEVLib.Screen.installComplete,
+            }
+            lua
+            {
+                create = Vehicles.Create.Radio,
+                update = NEVLib.Screen.update,
+                init = NEVLib.Screen.init,
+            }
+        }
+        /* Install / uninstall rules of the vanilla SUV template
+           (vehicle_suv_template.txt:136-275), which the generic part
+           templates above do not carry: aligned with the vanilla SUV
+           (user decision 2026-10-07, issue 26). Must follow the template
+           lines - a wildcard part merges into the parts existing so far. */
+        part TrunkDoor
+        {
+            table install
+            {
+                recipes = Intermediate Mechanics,
+            }
+            table uninstall
+            {
+                recipes = Intermediate Mechanics,
+            }
+        }
+        part EngineDoor
+        {
+            table install
+            {
+                recipes = Intermediate Mechanics,
+            }
+            table uninstall
+            {
+                recipes = Intermediate Mechanics,
+            }
+        }
+        part Windshield*
+        {
+            table install
+            {
+                recipes = Intermediate Mechanics,
+            }
+            table uninstall
+            {
+                recipes = Intermediate Mechanics,
+            }
+        }
+        part Window*
+        {
+            table install
+            {
+                recipes = Intermediate Mechanics,
+            }
+            table uninstall
+            {
+                recipes = Intermediate Mechanics,
+            }
+        }
+        part Door*
+        {
+            table install
+            {
+                recipes = Intermediate Mechanics,
+            }
+            table uninstall
+            {
+                recipes = Intermediate Mechanics,
+            }
+        }
+        part Brake*
+        {
+            table install
+            {
+                skills = Mechanics:6,
+                recipes = Intermediate Mechanics,
+            }
+            table uninstall
+            {
+                skills = Mechanics:6,
+                recipes = Intermediate Mechanics,
+            }
+        }
+        part Suspension*
+        {
+            table install
+            {
+                skills = Mechanics:6,
+                recipes = Intermediate Mechanics,
+            }
+            table uninstall
+            {
+                skills = Mechanics:6,
+                recipes = Intermediate Mechanics,
+            }
+        }
+        part Battery
+        {
+            /* specificItem defaults to true and would add the mechanicType (DESIGN 13.5-3). The library's three
+               BEV batteries (DESIGN 5.1 revision 17; a new car spawns with one of them, NEVLib.Battery.create) */
+            specificItem = false,
+            itemType = NEVLib.TractionBatteryBEV_Low;NEVLib.TractionBatteryBEV_Mid;NEVLib.TractionBatteryBEV_High,
+            /* Install / uninstall (user decisions 2026-10-07, issue 25):
+               Electricity 2, screwdriver + wrench, time 300. The keys merge
+               into the vanilla Battery template's tables (VehicleScript.
+               LoadTable): item 1 (screwdriver) stays, item 2 adds the wrench.
+               Like every vanilla part the skill is not a hard gate: below
+               level 2 the success chance drops (VehicleUtils.
+               calculateInstallationSuccess: level 0 = 50 %, 1 = 65 %). */
+            table install
+            {
+                items
+                {
+                    2
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                    }
+                }
+                time = 300,
+                skills = Electricity:2,
+            }
+            table uninstall
+            {
+                items
+                {
+                    2
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                    }
+                }
+                time = 300,
+                skills = Electricity:2,
+                /* vanilla rule + not while camping / charging (DESIGN 9) */
+                test = NEVLib.Parts.batteryUninstallTest,
+            }
+            lua
+            {
+                create = NEVLib.Parts.createBattery,
+                update = NEVLib.Parts.updateBattery,
+            }
+        }
+        part Engine
+        {
+            lua
+            {
+                create = Vehicles.Create.Engine,
+                update = NEVLib.Parts.updateMotor,
+                checkEngine = Vehicles.CheckEngine.Engine,
+            }
+        }
+        part Heater
+        {
+            category = engine,
+            lua
+            {
+                update = NEVLib.Parts.updateHeater,
+            }
+        }
+        part PassengerCompartment
+        {
+            category = nodisplay,
+            lua
+            {
+                update = Vehicles.Update.PassengerCompartment,
+            }
+        }
+        part TruckBed
+        {
+            /* the vanilla pickup's bed (DESIGN 5.4 P3 / CYBERTRUCK-DESIGN 6): vanilla type-2 trunk item, the part's
+               capacity 110 like vehicle_pickuptruck_template.txt; behind the tailgate, not reachable from the cabin
+               (the template's TruckBed access) */
+            container
+            {
+                capacity = 110,
+            }
+        }
+        part NEVFrunk
+        {
+            /* the frunk (#306): real 200 L x 0.175 = 35 (frunk-design 4); in front of the car, lid open */
+            container
+            {
+                capacity = 35,
+            }
+        }
+        part Seat*
+        {
+            table install
+            {
+                skills = Mechanics:2,
+                recipes = Intermediate Mechanics,
+            }
+            table uninstall
+            {
+                skills = Mechanics:2,
+                recipes = Intermediate Mechanics,
+            }
+        }
+        /* BEGIN armour add-ons (#273; DESIGN 9.1 revision 21, docs/design/parts/pickup-armor-design.md 4 / 5): the library's
+           pickup class items (NEVLib.Pickup_*, normal;Fine - the normal grade first, NEVLib.Armor.createNormal; the roof rack has
+           one grade). Car models nev_cybertruck_options_models.txt (docs/vehicles/cybertruck/art/armor-record-c4.md).
+           Install order (pickup-armor-design 4.2 / 4.3 / 5.3): a door plate needs its door and window and locks both; a bull bar
+           needs the frunk lid / tailgate its upper block hangs on and locks it (user 10-18, "按照你的推荐做"); a tire guard needs
+           its tire and locks it. requireUninstalled names ONE part (vanilla Vehicles.UninstallTest.Default: getPartById of the whole
+           value), and a part block here would replace the template's: so the door keeps the vanilla template's lock (window first)
+           and the window is locked by the plate - with a plate on, neither comes off.
+           A bull bar is one part with two models: Default = the upper block on the hood / tailgate bone (parent = EngineDoor /
+           TrunkDoor: drawn by that door's animation player), Lower = the fixed lower block (static). No Cat model (no cat-ear
+           easter egg for the pickup class, design 4.3); NEVLib.Armor.applyModels shows Default and leaves Lower to the engine.
+           After the template and wildcard lines, so the locks merge last. */
+        part NEVArmorWindowFrontLeft
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_OptDoorArmorFL,
+            }
+            parent = DoorFrontLeft,
+            area = SeatFrontLeft,
+            mechanicArea = Left,
+            category = bodywork,
+            itemType = NEVLib.Pickup_DoorArmor;NEVLib.Pickup_DoorArmor_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                requireInstalled = DoorFrontLeft;WindowFrontLeft,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVArmorWindowFrontRight
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_OptDoorArmorFR,
+            }
+            parent = DoorFrontRight,
+            area = SeatFrontRight,
+            mechanicArea = Right,
+            category = bodywork,
+            itemType = NEVLib.Pickup_DoorArmor;NEVLib.Pickup_DoorArmor_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                requireInstalled = DoorFrontRight;WindowFrontRight,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVArmorWindowRearLeft
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_OptDoorArmorRL,
+            }
+            parent = DoorRearLeft,
+            area = SeatRearLeft,
+            mechanicArea = Left,
+            category = bodywork,
+            itemType = NEVLib.Pickup_DoorArmor;NEVLib.Pickup_DoorArmor_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                requireInstalled = DoorRearLeft;WindowRearLeft,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVArmorWindowRearRight
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_OptDoorArmorRR,
+            }
+            parent = DoorRearRight,
+            area = SeatRearRight,
+            mechanicArea = Right,
+            category = bodywork,
+            itemType = NEVLib.Pickup_DoorArmor;NEVLib.Pickup_DoorArmor_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                requireInstalled = DoorRearRight;WindowRearRight,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVArmorWindshield
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_OptWindshieldFront,
+            }
+            area = Engine,
+            mechanicArea = Engine,
+            category = bodywork,
+            itemType = NEVLib.Pickup_WindshieldArmor;NEVLib.Pickup_WindshieldArmor_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 550,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                requireInstalled = Windshield,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 550,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVArmorWindshieldRear
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_OptWindshieldRear,
+            }
+            area = TruckBed,
+            mechanicArea = Back,
+            category = bodywork,
+            itemType = NEVLib.Pickup_WindshieldRearArmor;NEVLib.Pickup_WindshieldRearArmor_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 700,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                requireInstalled = WindshieldRear,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 700,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVBullbarFront
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_OptBullbarFront,
+            }
+            model Lower
+            {
+                file = NEV_Cybertruck_OptBullbarFrontLower,
+            }
+            parent = EngineDoor,
+            area = Engine,
+            mechanicArea = Engine,
+            category = bodywork,
+            itemType = NEVLib.Pickup_BullbarFront;NEVLib.Pickup_BullbarFront_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 450,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                requireInstalled = EngineDoor,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 450,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVBullbarRear
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_OptBullbarRear,
+            }
+            model Lower
+            {
+                file = NEV_Cybertruck_OptBullbarRearLower,
+            }
+            parent = TrunkDoor,
+            area = TruckBed,
+            mechanicArea = Back,
+            category = bodywork,
+            itemType = NEVLib.Pickup_BullbarRear;NEVLib.Pickup_BullbarRear_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 450,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                requireInstalled = TrunkDoor,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 450,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVRoofRack
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_OptRoofRack,
+            }
+            area = TruckBed,
+            mechanicArea = Back,
+            category = bodywork,
+            itemType = NEVLib.Pickup_RoofRack,
+            specificItem = false,
+            durability = 5,
+            container
+            {
+                capacity = 50,
+                test = NEVLib.Armor.roofRackAccess,
+            }
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 1500,
+                skills = Mechanics:1,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 1500,
+                skills = Mechanics:1,
+                recipes = Intermediate Mechanics,
+                requireEmpty = true,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVTireGuardFrontLeft
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_OptTireGuardL,
+            }
+            wheel = FrontLeft,
+            area = TireFrontLeft,
+            mechanicArea = Left,
+            category = tire,
+            itemType = NEVLib.Pickup_TireGuard;NEVLib.Pickup_TireGuard_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 400,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                requireInstalled = TireFrontLeft,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 400,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVTireGuardFrontRight
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_OptTireGuardR,
+            }
+            wheel = FrontRight,
+            area = TireFrontRight,
+            mechanicArea = Right,
+            category = tire,
+            itemType = NEVLib.Pickup_TireGuard;NEVLib.Pickup_TireGuard_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 400,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                requireInstalled = TireFrontRight,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 400,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVTireGuardRearLeft
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_OptTireGuardL,
+            }
+            wheel = RearLeft,
+            area = TireRearLeft,
+            mechanicArea = Left,
+            category = tire,
+            itemType = NEVLib.Pickup_TireGuard;NEVLib.Pickup_TireGuard_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 400,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                requireInstalled = TireRearLeft,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 400,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVTireGuardRearRight
+        {
+            model Default
+            {
+                file = NEV_Cybertruck_OptTireGuardR,
+            }
+            wheel = RearRight,
+            area = TireRearRight,
+            mechanicArea = Right,
+            category = tire,
+            itemType = NEVLib.Pickup_TireGuard;NEVLib.Pickup_TireGuard_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 400,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                requireInstalled = TireRearRight,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 400,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part WindowFrontLeft
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVArmorWindowFrontLeft,
+            }
+        }
+        part WindowFrontRight
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVArmorWindowFrontRight,
+            }
+        }
+        part WindowRearLeft
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVArmorWindowRearLeft,
+            }
+        }
+        part WindowRearRight
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVArmorWindowRearRight,
+            }
+        }
+        part Windshield
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVArmorWindshield,
+            }
+        }
+        part WindshieldRear
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVArmorWindshieldRear,
+            }
+        }
+        part EngineDoor
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVBullbarFront,
+            }
+        }
+        part TrunkDoor
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVBullbarRear,
+            }
+        }
+        part TireFrontLeft
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVTireGuardFrontLeft,
+            }
+        }
+        part TireFrontRight
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVTireGuardFrontRight,
+            }
+        }
+        part TireRearLeft
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVTireGuardRearLeft,
+            }
+        }
+        part TireRearRight
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVTireGuardRearRight,
+            }
+        }
+        /* END armour add-ons */
+        attachment trailer
+        {
+            offset = 0.0 -0.3419 -1.4177,
+            rotate = 0.0 0.0 0.0,
+            zoffset = -1.0,
+        }
+        attachment trailerfront
+        {
+            offset = 0.0 -0.3419 1.4233,
+            rotate = 0.0 0.0 0.0,
+            zoffset = 1.0,
+        }
+        template = PassengerSeat4,
+        /* own collision: four axis-aligned boxes around the body mesh (lower body, front upper, cabin, bed),
+           written by build_mod.py from the model and the profile's collision {belt, ws_y, rear_up} */
+        useChassisPhysicsCollision = false,
+        physics box
+        {
+            offset = 0 0.2833 0,
+            extents = 1.0328 0.4868 2.7917,
+            rotate = 0.0 0.0 0.0,
+        }
+        physics box
+        {
+            offset = 0 0.5337 1.1474,
+            extents = 0.9121 0.014 0.0268,
+            rotate = 0.0 0.0 0.0,
+        }
+        physics box
+        {
+            offset = 0 0.6763 0.3885,
+            extents = 0.9803 0.2991 1.4898,
+            rotate = 0.0 0.0 0.0,
+        }
+        physics box
+        {
+            offset = 0 0.6268 -0.8698,
+            extents = 0.9806 0.2002 0.9768,
+            rotate = 0.0 0.0 0.0,
+        }
+        passenger FrontLeft
+        {
+            hasRoof = true,
+            switchSeat RearMiddle
+            {
+                anim = Climb_WindowB,
+                rate = 0.23,
+                sound = VehicleChangeSeat,
+            }
+            position inside
+            {
+                offset = 0.1879 -0.0148 0.456,
+                rotate = 0.0 0.0 0.0,
+            }
+            position outside
+            {
+                offset = 0.6867 -0.5342 0.4154,
+                rotate = 0.0 0.0 0.0,
+                area = SeatFrontLeft,
+            }
+        }
+        passenger FrontRight
+        {
+            hasRoof = true,
+            switchSeat RearMiddle
+            {
+                anim = Climb_WindowB,
+                rate = 0.23,
+                sound = VehicleChangeSeat,
+            }
+            position inside
+            {
+                offset = -0.1879 -0.0148 0.456,
+                rotate = 0.0 0.0 0.0,
+            }
+            position outside
+            {
+                offset = -0.6867 -0.5342 0.4154,
+                rotate = 0.0 0.0 0.0,
+                area = SeatFrontRight,
+            }
+        }
+        passenger RearLeft
+        {
+            hasRoof = true,
+            switchSeat RearMiddle
+            {
+                anim = Climb_WindowB,
+                rate = 0.23,
+                sound = VehicleChangeSeat,
+            }
+            position inside
+            {
+                offset = 0.2398 0.0169 -0.0187,
+                rotate = 0.0 0.0 0.0,
+            }
+            position outside
+            {
+                offset = 0.6867 -0.5342 -0.1062,
+                rotate = 0.0 0.0 0.0,
+                area = SeatRearLeft,
+            }
+        }
+        passenger RearRight
+        {
+            hasRoof = true,
+            switchSeat RearMiddle
+            {
+                anim = Climb_WindowB,
+                rate = 0.23,
+                sound = VehicleChangeSeat,
+            }
+            position inside
+            {
+                offset = -0.2398 0.0169 -0.0187,
+                rotate = 0.0 0.0 0.0,
+            }
+            position outside
+            {
+                offset = -0.6867 -0.5342 -0.1062,
+                rotate = 0.0 0.0 0.0,
+                area = SeatRearRight,
+            }
+        }
+        passenger RearMiddle
+        {
+            /* 5th seat (the rear bench seats three); in and out through the rear left door */
+            hasRoof = true,
+            door = DoorRearLeft,
+            area = SeatRearLeft,
+            position inside
+            {
+                offset = 0.0 0.0169 -0.0187,
+                rotate = 0.0 0.0 0.0,
+            }
+            position outside
+            {
+                offset = 0.6867 -0.5342 -0.1062,
+                rotate = 0.0 0.0 0.0,
+                area = SeatRearLeft,
+            }
+            switchSeat RearLeft
+            {
+                anim = Climb_WindowB,
+                rate = 0.23,
+                sound = VehicleChangeSeat,
+            }
+            switchSeat RearRight
+            {
+                anim = Climb_WindowB,
+                rate = 0.23,
+                sound = VehicleChangeSeat,
+            }
+            switchSeat FrontLeft
+            {
+                anim = Climb_WindowB,
+                rate = 0.23,
+                sound = VehicleChangeSeat,
+            }
+            switchSeat FrontRight
+            {
+                anim = Climb_WindowB,
+                rate = 0.23,
+                sound = VehicleChangeSeat,
+            }
+        }
+        area SeatFrontLeft
+        {
+            xywh = 0.7527 0.4154 0.4725 0.4725,
+        }
+        area SeatFrontRight
+        {
+            xywh = -0.7527 0.4154 0.4725 0.4725,
+        }
+        area SeatRearLeft
+        {
+            xywh = 0.7527 -0.1062 0.4725 0.4725,
+        }
+        area SeatRearRight
+        {
+            xywh = -0.7527 -0.1062 0.4725 0.4725,
+        }
+        shadowExtents = 1.0328 2.7917,
+        shadowOffset = 0.0 0.0,
+    }
+
+    model NEV_Cybertruck
+    {
+        mesh = vehicles/NEV_Cybertruck|CT_body,
+        shader = vehicle_norandom_multiuv_noreflect,
+        invertX = false,
+        scale = 0.000494505495,
+    }
+}

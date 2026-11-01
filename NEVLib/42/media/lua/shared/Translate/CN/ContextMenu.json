@@ -1,0 +1,8 @@
+{
+    "ContextMenu_NEV_StopCharge": "停止充电",
+    "ContextMenu_NEV_FastCharge": "开始快充",
+    "ContextMenu_NEV_SlowCharge": "开始慢充（充电桩）",
+    "ContextMenu_NEV_CarFromStation": "用储能电源补电（%1 kWh）",
+    "ContextMenu_NEV_PowerStationToCar": "给附近的新能源车补电（%1 kWh）",
+    "ContextMenu_NEV_PowerStationCharge": "给储能电源充电（现在 %1 / %2 kWh）"
+}

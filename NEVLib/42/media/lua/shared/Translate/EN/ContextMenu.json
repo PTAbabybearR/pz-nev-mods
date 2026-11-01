@@ -1,0 +1,8 @@
+{
+    "ContextMenu_NEV_StopCharge": "Stop charging",
+    "ContextMenu_NEV_FastCharge": "Start fast charging",
+    "ContextMenu_NEV_SlowCharge": "Start charging (home charger)",
+    "ContextMenu_NEV_CarFromStation": "Charge from the power station (%1 kWh)",
+    "ContextMenu_NEV_PowerStationToCar": "Charge the nearby EV from it (%1 kWh)",
+    "ContextMenu_NEV_PowerStationCharge": "Charge the power station (now %1 / %2 kWh)"
+}

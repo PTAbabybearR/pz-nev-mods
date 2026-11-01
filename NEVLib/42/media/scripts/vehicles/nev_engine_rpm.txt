@@ -1,0 +1,21 @@
+module Base
+{
+    /* Single-speed electric drive for every NEV (docs/design/ui/dashboard-design.md 6).
+       With gearRatioCount = 1 the game never shifts (CarController
+       control_ForwardNew: one gear spans 0..maxSpeed) and the "engine" rpm
+       settles at gearChange, so the force only tapers with speed - no steps.
+       3000 = where the vanilla jeep curve sits in first gear, so pulling away
+       is as strong as before and the mid / high range loses the shift drops.
+       Referenced by engineRPMType = NEVLib_EV in the vehicle scripts; a missing
+       definition crashes on the first forward frame (empty rpm data), which
+       tools/check_static.py and the server self test guard against. */
+    vehicleEngineRPM NEVLib_EV
+    {
+        VERSION = 1,
+        data
+        {
+            gearChange = 3000,
+            afterGearChange = 3000,
+        }
+    }
+}

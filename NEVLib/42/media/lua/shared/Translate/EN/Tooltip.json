@@ -1,0 +1,7 @@
+{
+    "Tooltip_NEV_FineArmor": "Fine grade: loses about 1/6 less condition<br>per hit - lasts about a fifth longer than normal.",
+    "Tooltip_NEV_DoorArmor": "Covers the door and its window: protects the window<br>and whoever sits behind it. The door itself still takes crash damage.<br>With the window rolled down the plate stands aside and does not protect.",
+    "Tooltip_NEV_DoorArmorFine": "Covers the door and its window: protects the window<br>and whoever sits behind it. The door itself still takes crash damage.<br>With the window rolled down the plate stands aside and does not protect.<br>Fine grade: loses about 1/6 less condition<br>per hit - lasts about a fifth longer than normal.",
+    "Tooltip_NEV_TireGuard": "Protects the tire's condition (wear and hits come off the guard),<br>not its air. Remove the guard before changing the tire.",
+    "Tooltip_NEV_TireGuardFine": "Protects the tire's condition (wear and hits come off the guard),<br>not its air. Remove the guard before changing the tire.<br>Fine grade: loses about 1/6 less condition<br>per hit - lasts about a fifth longer than normal."
+}

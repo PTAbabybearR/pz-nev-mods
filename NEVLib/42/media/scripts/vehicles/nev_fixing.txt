@@ -1,0 +1,17 @@
+module Base
+{
+    /* #351: the roof racks (NEVLib.SUV_RoofRack, NEVLib.Pickup_RoofRack, nev_armor_items.txt) had no repair: no
+       fixing named them, and they are not armour (no nev:metalarmor tag, so NEVRepairArmor does not take them). This
+       is vanilla's Fix Trunk Welding (media/scripts/generated/vehicles/vehiclesfixing.txt, B42) for both racks, under
+       its own name so it does not replace vanilla's. Repaired in the inventory after taking the rack off, like a
+       vanilla door (the NEVRoofRack parts set no repairMechanic; DESIGN 9.1 revision 35). Module Base only to match
+       vanilla (#335). */
+    fixing Fix NEV Roof Rack Welding
+    {
+        Require = NEVLib.SUV_RoofRack;NEVLib.Pickup_RoofRack,
+        GlobalItem = Base.BlowTorch=2,
+        ConditionModifier = 1.2,
+        Fixer = Base.SheetMetal; MetalWelding=3;Mechanics=2,
+        Fixer = Base.SmallSheetMetal=2; MetalWelding=3;Mechanics=2,
+    }
+}

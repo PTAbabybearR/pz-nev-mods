@@ -1,0 +1,307 @@
+module NEVLib
+{
+    imports
+    {
+        Base
+    }
+
+    /* Home charger as a vanilla Moveable (DESIGN 6.1 v1.10, user 2026-10-07):
+       placed with the vanilla furniture cursor ("Place"; drag with the
+       mouse held to turn it through the four facings of tileset
+       nev_charger_01, art/items/gen_tiles.py - R is the pick-up mode's
+       "next object", round 4 game test),
+       picked up again with a screwdriver. The tiles name this item in
+       CustomItem, like the vanilla radio (appliances_radio_01 /
+       Base.RadioBlack). The M1 / v1.9 world-item charger NEVLib.HomeCharger
+       was never released and is gone (REVIEW 3.3-13). */
+    item HomeCharger2
+    {
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:moveable,
+        WorldObjectSprite = nev_charger_01_0,
+        Weight = 8.0,
+        Icon = NEV_HomeCharger,
+        MetalValue = 20.0,
+        WorldStaticModel = NEV_HomeCharger,
+    }
+
+    /* Portable power station (DESIGN 6.4 / 5.3): a vanilla petrol can's worth
+       of energy (10 L x 3.06 = 30.6 kWh) in a drainable item
+       (NEVLib.PowerStation), found with 0 - 50 % charge (set in
+       OnFillContainer: an item script OnCreate cannot, the factory refills
+       drainables after it), loot only. Weight 11.6 = a full PetrolCan
+       (user 2026-10-10: "it does what the petrol can does"), one hand. */
+    item PortablePowerStation
+    {
+        DisplayCategory = Electronics,
+        Weight = 11.6,
+        ItemType = base:drainable,
+        UseDelta = 0.00001,
+        UseWhileEquipped = false,
+        KeepOnDeplete = true,
+        cantBeConsolided = true,
+        Icon = NEV_PortablePowerStation,
+        MetalValue = 15.0,
+        WorldStaticModel = NEV_PowerStation,
+    }
+
+    /* Infotainment screen (docs/design/cabin/tv-design.md, user decision 2026-10-07):
+       goes into the vanilla "Radio" part of every NEV instead of a radio.
+       Device properties copied from vanilla TvBlack, so the part becomes a
+       television that plays VHS tapes (AcceptMediaType 1); the vanilla
+       Vehicles.Create / Update / InstallComplete.Radio copy them onto the
+       part's DeviceData. Powered by the car (UsesBattery = false).
+       Ground model: the vanilla radio's (vanilla TVs are sprites, no item model). */
+    item InfotainmentScreen
+    {
+        DisplayCategory = Communications,
+        ItemType = base:radio,
+        Weight = 3.0,
+        Icon = Television,
+        AcceptMediaType = 1,
+        BaseVolumeRange = 12,
+        DisappearOnUse = false,
+        IsHighTier = false,
+        IsPortable = false,
+        IsTelevision = true,
+        MaxChannel = 1000000,
+        MicRange = 0,
+        MinChannel = 200,
+        TransmitRange = 0,
+        TwoWay = false,
+        UseDelta = 0.009,
+        UseWhileEquipped = false,
+        UsesBattery = false,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        WorldStaticModel = RadioBlack_Ground,
+    }
+
+    /* Sandbox InfotainmentTV off (DESIGN 7.5): the same screen as a car radio,
+       FM only, no media (vanilla RadioBlack channels). NEVLib.Screen swaps the
+       installed item; vanilla Vehicles.Update.Radio copies these values. */
+    item InfotainmentScreenRadio
+    {
+        DisplayCategory = Communications,
+        ItemType = base:radio,
+        Weight = 3.0,
+        Icon = Television,
+        BaseVolumeRange = 12,
+        DisappearOnUse = false,
+        IsHighTier = false,
+        IsPortable = false,
+        IsTelevision = false,
+        MaxChannel = 108000,
+        MicRange = 0,
+        MinChannel = 88000,
+        TransmitRange = 0,
+        TwoWay = false,
+        UseDelta = 0.009,
+        UseWhileEquipped = false,
+        UsesBattery = false,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        WorldStaticModel = RadioBlack_Ground,
+    }
+
+    /* Range extender unit for the NEVRangeExtender part (DESIGN 3.1 / 9).
+       Condition drops while it runs (NEVLib.Parts.updateRangeExtender).
+       Weight 25, carried in both hands like the vanilla generator
+       (base:heavyitem + RequiresEquippedBothHands; M1 issue 14). */
+    item RangeExtender
+    {
+        DisplayCategory = VehicleMaintenance,
+        Weight = 25.0,
+        RequiresEquippedBothHands = true,
+        Tags = base:heavyitem,
+        ItemType = base:normal,
+        Icon = EngineParts,
+        ConditionMax = 100,
+        ChanceToSpawnDamaged = 20,
+        MechanicsItem = true,
+        WorldStaticModel = EngineParts,
+    }
+
+    /* Traction batteries (DESIGN 5.1 / 9 revision 17, #215): three powertrains x low / mid / high; the capacity
+       belongs to the item (NEVLib.Registry.BATTERY_KINDS: BEV 75 / 100 / 125, EREV 37.5 / 50 / 62.5, PHEV
+       15 / 20 / 25 kWh) and every NEV of that powertrain takes all three. Occupies the vanilla "Battery" part; must
+       be drainable for BaseVehicle.getBatteryCharge() (DESIGN 3.1). No base:carbattery tag: vanilla battery
+       chargers / recipes must not take it. Weight = capacity x 0.8, rounded, at most 40 (NEVLib.Battery.itemWeight;
+       tools/balance_model.py checks the scripts against it), carried in both hands like the vanilla generator. */
+
+    item TractionBatteryBEV_Low
+    {
+        DisplayCategory = VehicleMaintenance,
+        Weight = 40.0,
+        RequiresEquippedBothHands = true,
+        Tags = base:heavyitem,
+        ItemType = base:drainable,
+        UseDelta = 0.00001,
+        UseWhileEquipped = false,
+        Icon = CarBattery,
+        cantBeConsolided = true,
+        ConditionMax = 100,
+        ChanceToSpawnDamaged = 10,
+        MechanicsItem = true,
+        WorldStaticModel = CarBattery,
+        KeepOnDeplete = true,
+    }
+
+    item TractionBatteryBEV_Mid
+    {
+        DisplayCategory = VehicleMaintenance,
+        Weight = 40.0,
+        RequiresEquippedBothHands = true,
+        Tags = base:heavyitem,
+        ItemType = base:drainable,
+        UseDelta = 0.00001,
+        UseWhileEquipped = false,
+        Icon = CarBattery,
+        cantBeConsolided = true,
+        ConditionMax = 100,
+        ChanceToSpawnDamaged = 10,
+        MechanicsItem = true,
+        WorldStaticModel = CarBattery,
+        KeepOnDeplete = true,
+    }
+
+    item TractionBatteryBEV_High
+    {
+        DisplayCategory = VehicleMaintenance,
+        Weight = 40.0,
+        RequiresEquippedBothHands = true,
+        Tags = base:heavyitem,
+        ItemType = base:drainable,
+        UseDelta = 0.00001,
+        UseWhileEquipped = false,
+        Icon = CarBattery,
+        cantBeConsolided = true,
+        ConditionMax = 100,
+        ChanceToSpawnDamaged = 10,
+        MechanicsItem = true,
+        WorldStaticModel = CarBattery,
+        KeepOnDeplete = true,
+    }
+
+    item TractionBatteryEREV_Low
+    {
+        DisplayCategory = VehicleMaintenance,
+        Weight = 30.0,
+        RequiresEquippedBothHands = true,
+        Tags = base:heavyitem,
+        ItemType = base:drainable,
+        UseDelta = 0.00001,
+        UseWhileEquipped = false,
+        Icon = CarBattery,
+        cantBeConsolided = true,
+        ConditionMax = 100,
+        ChanceToSpawnDamaged = 10,
+        MechanicsItem = true,
+        WorldStaticModel = CarBattery,
+        KeepOnDeplete = true,
+    }
+
+    item TractionBatteryEREV_Mid
+    {
+        DisplayCategory = VehicleMaintenance,
+        Weight = 40.0,
+        RequiresEquippedBothHands = true,
+        Tags = base:heavyitem,
+        ItemType = base:drainable,
+        UseDelta = 0.00001,
+        UseWhileEquipped = false,
+        Icon = CarBattery,
+        cantBeConsolided = true,
+        ConditionMax = 100,
+        ChanceToSpawnDamaged = 10,
+        MechanicsItem = true,
+        WorldStaticModel = CarBattery,
+        KeepOnDeplete = true,
+    }
+
+    item TractionBatteryEREV_High
+    {
+        DisplayCategory = VehicleMaintenance,
+        Weight = 40.0,
+        RequiresEquippedBothHands = true,
+        Tags = base:heavyitem,
+        ItemType = base:drainable,
+        UseDelta = 0.00001,
+        UseWhileEquipped = false,
+        Icon = CarBattery,
+        cantBeConsolided = true,
+        ConditionMax = 100,
+        ChanceToSpawnDamaged = 10,
+        MechanicsItem = true,
+        WorldStaticModel = CarBattery,
+        KeepOnDeplete = true,
+    }
+
+    item TractionBatteryPHEV_Low
+    {
+        DisplayCategory = VehicleMaintenance,
+        Weight = 12.0,
+        RequiresEquippedBothHands = true,
+        Tags = base:heavyitem,
+        ItemType = base:drainable,
+        UseDelta = 0.00001,
+        UseWhileEquipped = false,
+        Icon = CarBattery,
+        cantBeConsolided = true,
+        ConditionMax = 100,
+        ChanceToSpawnDamaged = 10,
+        MechanicsItem = true,
+        WorldStaticModel = CarBattery,
+        KeepOnDeplete = true,
+    }
+
+    item TractionBatteryPHEV_Mid
+    {
+        DisplayCategory = VehicleMaintenance,
+        Weight = 16.0,
+        RequiresEquippedBothHands = true,
+        Tags = base:heavyitem,
+        ItemType = base:drainable,
+        UseDelta = 0.00001,
+        UseWhileEquipped = false,
+        Icon = CarBattery,
+        cantBeConsolided = true,
+        ConditionMax = 100,
+        ChanceToSpawnDamaged = 10,
+        MechanicsItem = true,
+        WorldStaticModel = CarBattery,
+        KeepOnDeplete = true,
+    }
+
+    item TractionBatteryPHEV_High
+    {
+        DisplayCategory = VehicleMaintenance,
+        Weight = 20.0,
+        RequiresEquippedBothHands = true,
+        Tags = base:heavyitem,
+        ItemType = base:drainable,
+        UseDelta = 0.00001,
+        UseWhileEquipped = false,
+        Icon = CarBattery,
+        cantBeConsolided = true,
+        ConditionMax = 100,
+        ChanceToSpawnDamaged = 10,
+        MechanicsItem = true,
+        WorldStaticModel = CarBattery,
+        KeepOnDeplete = true,
+    }
+
+    /* Car fridge (DESIGN 7.1 / 9 revision 17, #215): one item for every NEV, fixed in its part (no install / uninstall);
+       the capacity is the car's (the part's container, set on the item when the car is made). Weight as the vanilla
+       type-2 glove box it replaces (4: the car's running mass stays as it was). Icon: a vanilla stand-in until the
+       art pass (#197). */
+    item Fridge
+    {
+        DisplayCategory = VehicleMaintenance,
+        Weight = 4.0,
+        ItemType = base:normal,
+        Icon = GloveBox,
+        ConditionMax = 100,
+        MechanicsItem = true,
+    }
+}

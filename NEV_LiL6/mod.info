@@ -1,0 +1,10 @@
+name=NEV - Li Auto L6
+id=NEV_LiL6
+require=\NEVLib
+description=Li Auto L6 extended-range electric SUV for the NEV series. Requires NEV Lib.
+author=babybearR
+versionMin=42.0.0
+modversion=1.5.0
+category=vehicle
+icon=icon.png
+poster=poster.png

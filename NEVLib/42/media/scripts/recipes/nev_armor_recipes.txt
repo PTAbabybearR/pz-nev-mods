@@ -1,0 +1,656 @@
+module NEVLib
+{
+    imports
+    {
+        Base
+    }
+
+    /* Armour add-ons by vehicle class (DESIGN 9.1 revision 17, #215): one recipe per class item, named
+       NEVMake<Class><Piece>[Fine], taught by the class manual (NEVLib.Manual_<Class>, NeedToBeLearn); the
+       metalworking level stays a gate too. The Fine grade = the normal recipe with its first (main) input x 1.5
+       rounded up (tools/check_static.py armor-classes). Welding with vanilla materials only (user 2026-10-12 /
+       2026-10-15). Blow torch inputs count uses (InputScript: a drainable without mode / ItemCount); the mask is
+       kept. Times sit between vanilla's MakeMetalSheet (250) and the scrap armour (600). */
+    craftRecipe NEVMakeSUVWindowGuard
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 300,
+        SkillRequired = MetalWelding:4,
+        Tags = InHandCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:15,
+        inputs
+        {
+            item 1 [Base.SheetMetal],
+            item 2 [Base.SmallSheetMetal],
+            item 2 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.SUV_WindowGuard,
+        }
+    }
+
+    craftRecipe NEVMakeSUVWindowGuardFine
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 300,
+        SkillRequired = MetalWelding:4,
+        Tags = InHandCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:15,
+        inputs
+        {
+            item 2 [Base.SheetMetal],
+            item 2 [Base.SmallSheetMetal],
+            item 2 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.SUV_WindowGuard_Fine,
+        }
+    }
+
+    craftRecipe NEVMakeSUVWindshieldArmor
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 400,
+        SkillRequired = MetalWelding:5,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:20,
+        inputs
+        {
+            item 2 [Base.SheetMetal],
+            item 2 [Base.SmallSheetMetal],
+            item 3 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.SUV_WindshieldArmor,
+        }
+    }
+
+    craftRecipe NEVMakeSUVWindshieldArmorFine
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 400,
+        SkillRequired = MetalWelding:5,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:20,
+        inputs
+        {
+            item 3 [Base.SheetMetal],
+            item 2 [Base.SmallSheetMetal],
+            item 3 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.SUV_WindshieldArmor_Fine,
+        }
+    }
+
+    craftRecipe NEVMakeSUVWindshieldRearArmor
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 400,
+        SkillRequired = MetalWelding:5,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:20,
+        inputs
+        {
+            item 2 [Base.SheetMetal],
+            item 2 [Base.SmallSheetMetal],
+            item 3 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.SUV_WindshieldRearArmor,
+        }
+    }
+
+    craftRecipe NEVMakeSUVWindshieldRearArmorFine
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 400,
+        SkillRequired = MetalWelding:5,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:20,
+        inputs
+        {
+            item 3 [Base.SheetMetal],
+            item 2 [Base.SmallSheetMetal],
+            item 3 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.SUV_WindshieldRearArmor_Fine,
+        }
+    }
+
+    craftRecipe NEVMakeSUVBullbarFront
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 600,
+        SkillRequired = MetalWelding:6,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:30,
+        inputs
+        {
+            item 6 [Base.MetalPipe],
+            item 2 [Base.MetalBar],
+            item 4 [Base.NutsBolts],
+            item 4 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+            item 1 tags[base:wrench] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.SUV_BullbarFront,
+        }
+    }
+
+    craftRecipe NEVMakeSUVBullbarFrontFine
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 600,
+        SkillRequired = MetalWelding:6,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:30,
+        inputs
+        {
+            item 9 [Base.MetalPipe],
+            item 2 [Base.MetalBar],
+            item 4 [Base.NutsBolts],
+            item 4 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+            item 1 tags[base:wrench] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.SUV_BullbarFront_Fine,
+        }
+    }
+
+    /* Rear bull bar: the front one's frame plus a metal bar for the longer brackets that clear the tailgate. */
+    craftRecipe NEVMakeSUVBullbarRear
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 600,
+        SkillRequired = MetalWelding:6,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:30,
+        inputs
+        {
+            item 6 [Base.MetalPipe],
+            item 3 [Base.MetalBar],
+            item 4 [Base.NutsBolts],
+            item 4 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+            item 1 tags[base:wrench] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.SUV_BullbarRear,
+        }
+    }
+
+    craftRecipe NEVMakeSUVBullbarRearFine
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 600,
+        SkillRequired = MetalWelding:6,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:30,
+        inputs
+        {
+            item 9 [Base.MetalPipe],
+            item 3 [Base.MetalBar],
+            item 4 [Base.NutsBolts],
+            item 4 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+            item 1 tags[base:wrench] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.SUV_BullbarRear_Fine,
+        }
+    }
+
+    craftRecipe NEVMakeSUVRoofRack
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 500,
+        SkillRequired = MetalWelding:3,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:20,
+        inputs
+        {
+            item 4 [Base.MetalPipe],
+            item 4 [Base.MetalBar],
+            item 2 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.SUV_RoofRack,
+        }
+    }
+
+    /* SUV tire guard (#286): the pickup tire guard's recipes for the SUV class. */
+    craftRecipe NEVMakeSUVTireGuard
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 300,
+        SkillRequired = MetalWelding:4,
+        Tags = InHandCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:15,
+        inputs
+        {
+            item 1 [Base.SheetMetal],
+            item 2 [Base.SmallSheetMetal],
+            item 2 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.SUV_TireGuard,
+        }
+    }
+
+    craftRecipe NEVMakeSUVTireGuardFine
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 300,
+        SkillRequired = MetalWelding:4,
+        Tags = InHandCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:15,
+        inputs
+        {
+            item 2 [Base.SheetMetal],
+            item 2 [Base.SmallSheetMetal],
+            item 2 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.SUV_TireGuard_Fine,
+        }
+    }
+
+    /* Pickup class (DESIGN 9.1 revision 21, #272; docs/design/parts/pickup-armor-design.md 4.1): the SUV class's
+       recipes piece for piece (same welding level, materials, time); the door armour plate and the tire guard (new)
+       take the window grille's (one sheet-metal piece per position). */
+    craftRecipe NEVMakePickupDoorArmor
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 300,
+        SkillRequired = MetalWelding:4,
+        Tags = InHandCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:15,
+        inputs
+        {
+            item 1 [Base.SheetMetal],
+            item 2 [Base.SmallSheetMetal],
+            item 2 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.Pickup_DoorArmor,
+        }
+    }
+
+    craftRecipe NEVMakePickupDoorArmorFine
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 300,
+        SkillRequired = MetalWelding:4,
+        Tags = InHandCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:15,
+        inputs
+        {
+            item 2 [Base.SheetMetal],
+            item 2 [Base.SmallSheetMetal],
+            item 2 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.Pickup_DoorArmor_Fine,
+        }
+    }
+
+    craftRecipe NEVMakePickupWindshieldArmor
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 400,
+        SkillRequired = MetalWelding:5,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:20,
+        inputs
+        {
+            item 2 [Base.SheetMetal],
+            item 2 [Base.SmallSheetMetal],
+            item 3 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.Pickup_WindshieldArmor,
+        }
+    }
+
+    craftRecipe NEVMakePickupWindshieldArmorFine
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 400,
+        SkillRequired = MetalWelding:5,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:20,
+        inputs
+        {
+            item 3 [Base.SheetMetal],
+            item 2 [Base.SmallSheetMetal],
+            item 3 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.Pickup_WindshieldArmor_Fine,
+        }
+    }
+
+    craftRecipe NEVMakePickupWindshieldRearArmor
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 400,
+        SkillRequired = MetalWelding:5,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:20,
+        inputs
+        {
+            item 2 [Base.SheetMetal],
+            item 2 [Base.SmallSheetMetal],
+            item 3 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.Pickup_WindshieldRearArmor,
+        }
+    }
+
+    craftRecipe NEVMakePickupWindshieldRearArmorFine
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 400,
+        SkillRequired = MetalWelding:5,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:20,
+        inputs
+        {
+            item 3 [Base.SheetMetal],
+            item 2 [Base.SmallSheetMetal],
+            item 3 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.Pickup_WindshieldRearArmor_Fine,
+        }
+    }
+
+    craftRecipe NEVMakePickupBullbarFront
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 600,
+        SkillRequired = MetalWelding:6,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:30,
+        inputs
+        {
+            item 6 [Base.MetalPipe],
+            item 2 [Base.MetalBar],
+            item 4 [Base.NutsBolts],
+            item 4 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+            item 1 tags[base:wrench] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.Pickup_BullbarFront,
+        }
+    }
+
+    craftRecipe NEVMakePickupBullbarFrontFine
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 600,
+        SkillRequired = MetalWelding:6,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:30,
+        inputs
+        {
+            item 9 [Base.MetalPipe],
+            item 2 [Base.MetalBar],
+            item 4 [Base.NutsBolts],
+            item 4 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+            item 1 tags[base:wrench] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.Pickup_BullbarFront_Fine,
+        }
+    }
+
+    craftRecipe NEVMakePickupBullbarRear
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 600,
+        SkillRequired = MetalWelding:6,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:30,
+        inputs
+        {
+            item 6 [Base.MetalPipe],
+            item 3 [Base.MetalBar],
+            item 4 [Base.NutsBolts],
+            item 4 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+            item 1 tags[base:wrench] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.Pickup_BullbarRear,
+        }
+    }
+
+    craftRecipe NEVMakePickupBullbarRearFine
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 600,
+        SkillRequired = MetalWelding:6,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:30,
+        inputs
+        {
+            item 9 [Base.MetalPipe],
+            item 3 [Base.MetalBar],
+            item 4 [Base.NutsBolts],
+            item 4 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+            item 1 tags[base:wrench] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.Pickup_BullbarRear_Fine,
+        }
+    }
+
+    craftRecipe NEVMakePickupRoofRack
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 500,
+        SkillRequired = MetalWelding:3,
+        Tags = AnySurfaceCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:20,
+        inputs
+        {
+            item 4 [Base.MetalPipe],
+            item 4 [Base.MetalBar],
+            item 2 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.Pickup_RoofRack,
+        }
+    }
+
+    craftRecipe NEVMakePickupTireGuard
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 300,
+        SkillRequired = MetalWelding:4,
+        Tags = InHandCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:15,
+        inputs
+        {
+            item 1 [Base.SheetMetal],
+            item 2 [Base.SmallSheetMetal],
+            item 2 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.Pickup_TireGuard,
+        }
+    }
+
+    craftRecipe NEVMakePickupTireGuardFine
+    {
+        timedAction = Welding,
+        NeedToBeLearn = true,
+        time = 300,
+        SkillRequired = MetalWelding:4,
+        Tags = InHandCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:15,
+        inputs
+        {
+            item 2 [Base.SheetMetal],
+            item 2 [Base.SmallSheetMetal],
+            item 2 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+            item 1 tags[base:sheetmetalsnips;base:metalsaw] mode:keep flags[MayDegradeLight],
+        }
+        outputs
+        {
+            item 1 NEVLib.Pickup_TireGuard_Fine,
+        }
+    }
+
+    /* Repair any armour add-on of any class and grade (tag nev:metalarmor): +25 condition
+       (NEVLib.Armor.onRepairCreate), only on a damaged piece; the item stays what it was (a Fine piece stays Fine). */
+    craftRecipe NEVRepairArmor
+    {
+        timedAction = Welding,
+        time = 150,
+        AllowBatchCraft = false,
+        SkillRequired = MetalWelding:3,
+        Tags = InHandCraft;Welding,
+        category = Metalworking,
+        xpAward = MetalWelding:5,
+        OnCreate = NEVLib.Armor.onRepairCreate,
+        inputs
+        {
+            item 1 tags[nev:metalarmor] mode:keep flags[IsDamaged],
+            item 1 [Base.SmallSheetMetal],
+            item 1 [Base.BlowTorch],
+            item 1 tags[base:weldingmask] mode:keep,
+        }
+        outputs
+        {
+        }
+    }
+}

@@ -1,0 +1,11 @@
+name=NEV Lib
+id=NEVLib
+description=Core library of the NEV (new energy vehicle) series: keyless power-on, traction battery, range extender, fast / home charging, portable power station, fridge, camping mode, cabin air filter, infotainment screen, NEV dashboard.
+author=babybearR
+versionMin=42.0.0
+modversion=1.5.0
+category=vehicle
+pack=NEVTiles
+tiledef=nev_tiles 6214
+icon=icon.png
+poster=poster.png

@@ -1,0 +1,10 @@
+name=NEV - Tesla Cybertruck
+id=NEV_Cybertruck
+require=\NEVLib
+description=Tesla Cybertruck battery-electric pickup for the NEV series. Requires NEV Lib.
+author=babybearR
+versionMin=42.0.0
+modversion=1.1.0
+category=vehicle
+icon=icon.png
+poster=poster.png

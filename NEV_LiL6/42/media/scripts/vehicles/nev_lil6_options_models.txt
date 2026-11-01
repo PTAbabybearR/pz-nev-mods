@@ -1,0 +1,121 @@
+module Base
+{
+    /* NEV_LiL6 armour / add-on part models (v1.3, art segment 5: docs/vehicles/lil6/art/options-record-s5.md; rebuild with
+       bash art/vehicles/lil6/options/build_s5.sh). Same mesh units and scale as nev_lil6_models.txt (build_mod.py).
+       Parts that move with a door / the tailgate use the vehicle shader: their texels sit in the body atlas
+       (nev_lil6_shell_*, the engine binds the parent car's skin for every vehicle-shader part). Parts that never
+       move use vehiclewheel + their own texture (vehiclewheel gets no bone palette, so static only).
+       The rear window guards' quarter-window section (#210, user option 2) is a second, static model of the same
+       part: skinned to body_bone and drawn by the door's animation player it landed turned 180 deg about the
+       vertical axis (in-game 10-16: the rear-left piece over the front-right A pillar); static needs no bones. */
+    model NEV_LiL6_OptWindowFL
+    {
+        mesh = vehicles/NEV_LiL6_Options|LiL6_opt_window_fl,
+        shader = vehicle_multiuv_noreflect,
+        static = false,
+        boneWeight = door_fl_bone 1.0,
+        scale = 0.000494505495,
+    }
+    model NEV_LiL6_OptWindowFR
+    {
+        mesh = vehicles/NEV_LiL6_Options|LiL6_opt_window_fr,
+        shader = vehicle_multiuv_noreflect,
+        static = false,
+        boneWeight = door_fr_bone 1.0,
+        scale = 0.000494505495,
+    }
+    model NEV_LiL6_OptWindowRL
+    {
+        mesh = vehicles/NEV_LiL6_Options|LiL6_opt_window_rl,
+        shader = vehicle_multiuv_noreflect,
+        static = false,
+        boneWeight = door_rl_bone 1.0,
+        scale = 0.000494505495,
+    }
+    model NEV_LiL6_OptWindowRR
+    {
+        mesh = vehicles/NEV_LiL6_Options|LiL6_opt_window_rr,
+        shader = vehicle_multiuv_noreflect,
+        static = false,
+        boneWeight = door_rr_bone 1.0,
+        scale = 0.000494505495,
+    }
+    model NEV_LiL6_OptWindowRLQuarter
+    {
+        mesh = vehicles/NEV_LiL6_Options|LiL6_opt_window_rl_quarter,
+        shader = vehicle_norandom_multiuv_noreflect,
+        scale = 0.000494505495,
+    }
+    model NEV_LiL6_OptWindowRRQuarter
+    {
+        mesh = vehicles/NEV_LiL6_Options|LiL6_opt_window_rr_quarter,
+        shader = vehicle_norandom_multiuv_noreflect,
+        scale = 0.000494505495,
+    }
+    model NEV_LiL6_OptWindshieldRear
+    {
+        mesh = vehicles/NEV_LiL6_Options|LiL6_opt_windshield_rear,
+        shader = vehicle_multiuv_noreflect,
+        static = false,
+        boneWeight = trunk_bone 1.0,
+        scale = 0.000494505495,
+    }
+    model NEV_LiL6_OptWindshieldFront
+    {
+        mesh = vehicles/NEV_LiL6_Options|LiL6_opt_windshield_front,
+        texture = Vehicles/nev_lil6_options,
+        shader = vehiclewheel,
+        scale = 0.000494505495,
+    }
+    model NEV_LiL6_OptBullbarFront
+    {
+        mesh = vehicles/NEV_LiL6_Options|LiL6_opt_bullbar_front,
+        texture = Vehicles/nev_lil6_options,
+        shader = vehiclewheel,
+        scale = 0.000494505495,
+    }
+    model NEV_LiL6_OptBullbarFrontCat
+    {
+        mesh = vehicles/NEV_LiL6_Options|LiL6_opt_bullbar_front_cat,
+        texture = Vehicles/nev_lil6_options,
+        shader = vehiclewheel,
+        scale = 0.000494505495,
+    }
+    model NEV_LiL6_OptBullbarRear
+    {
+        mesh = vehicles/NEV_LiL6_Options|LiL6_opt_bullbar_rear,
+        texture = Vehicles/nev_lil6_options,
+        shader = vehiclewheel,
+        scale = 0.000494505495,
+    }
+    model NEV_LiL6_OptBullbarRearCat
+    {
+        mesh = vehicles/NEV_LiL6_Options|LiL6_opt_bullbar_rear_cat,
+        texture = Vehicles/nev_lil6_options,
+        shader = vehiclewheel,
+        scale = 0.000494505495,
+    }
+    model NEV_LiL6_OptBullbarRearTrunk
+    {
+        mesh = vehicles/NEV_LiL6_Options|LiL6_opt_bullbar_rear_trunk,
+        shader = vehicle_multiuv_noreflect,
+        static = false,
+        boneWeight = trunk_bone 1.0,
+        scale = 0.000494505495,
+    }
+    model NEV_LiL6_OptBullbarRearTrunkCat
+    {
+        mesh = vehicles/NEV_LiL6_Options|LiL6_opt_bullbar_rear_trunk_cat,
+        shader = vehicle_multiuv_noreflect,
+        static = false,
+        boneWeight = trunk_bone 1.0,
+        scale = 0.000494505495,
+    }
+    model NEV_LiL6_OptRoofRack
+    {
+        mesh = vehicles/NEV_LiL6_Options|LiL6_opt_roofrack,
+        texture = Vehicles/nev_lil6_options,
+        shader = vehiclewheel,
+        scale = 0.000494505495,
+    }
+}

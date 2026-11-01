@@ -1,0 +1,77 @@
+pz-nev mods - Notices
+NEV Lib, NEV - Li Auto L6 and NEV - Tesla Cybertruck (Project Zomboid mods)
+
+LICENCES
+  Code (Lua files, game scripts, translations, mod.info):
+    Mozilla Public License 2.0, see LICENSE.txt.
+  Art (models, textures, icons, interface images and other media):
+    the author keeps the rights, see LICENSE-ART.txt.
+  The parts listed under "Project Zomboid" below are covered by neither.
+
+PROJECT ZOMBOID
+Project Zomboid is (c) The Indie Stone. These mods are made for the game and
+reuse some of the game's own content. Those parts remain The Indie Stone's;
+they are not licensed under the Mozilla Public License or LICENSE-ART.txt:
+  - The vehicle scripts (NEV_LiL6: nev_lil6.txt; NEV_Cybertruck:
+    nev_cybertruck.txt) follow the structure of the game's own vehicle
+    scripts and reuse parts of their templates and values (about 85-90 lines
+    per vehicle), among them the install / uninstall rules of
+    vehicle_suv_template.txt, the glove box of template_glovebox.txt and,
+    for the Li Auto L6, collision boxes derived from
+    template_suv_collision.txt. This is how vehicle mods are made for the
+    game.
+  - The repair recipes "Fix LiL6 Trunk Welding" (NEV_LiL6:
+    nev_lil6_fixing.txt) and "Fix NEV Roof Rack Welding" (NEVLib:
+    nev_fixing.txt) are the game's "Fix Trunk Welding" (vehiclesfixing.txt)
+    for other items.
+  - The frunk template (NEVLib: nev_frunk.txt) is modelled on the game's
+    trunk part (template_trunk.txt, TruckBed).
+  - The infotainment screen item (NEVLib: nev_items.txt, InfotainmentScreen)
+    copies the device properties of the game's TvBlack.
+  - The fridge factors (NEVLib: Fridge.lua, FRIDGE_FACTOR and ROT_SPEED) are
+    the values of the game's Food.getFridgeFactor / Food.getFoodRotSpeed.
+No other game asset (model, texture, sound, decompiled code) is included.
+Where the mods show game images or models (for example vanilla icons), they
+load them from the game.
+
+TRADEMARKS
+Vehicle names are used only to identify the real-world vehicles the mods are
+modelled after. All trademarks belong to their respective owners. These mods
+are not affiliated with or endorsed by any vehicle manufacturer.
+
+------------------------------------------------------------------------
+中文说明（以上英文为准）
+
+声明：NEV Lib、理想L6、Tesla Cybertruck（《僵尸毁灭工程》mod）
+
+许可
+  代码（Lua 文件、游戏脚本、翻译、mod.info）：Mozilla Public License 2.0，
+    见 LICENSE.txt。
+  美术（模型、贴图、图标、界面图片及其他媒体）：作者保留权利，
+    见 LICENSE-ART.txt。
+  下面「僵尸毁灭工程」一节列出的部分，不受这两份许可约束。
+
+僵尸毁灭工程
+《僵尸毁灭工程》（Project Zomboid）版权属于 The Indie Stone。本系列 mod 是为
+这款游戏做的，复用了游戏本身的一部分内容。这些部分仍归 The Indie Stone 所有，
+不按 Mozilla Public License 或 LICENSE-ART.txt 授权：
+  - 车辆脚本（NEV_LiL6 的 nev_lil6.txt、NEV_Cybertruck 的 nev_cybertruck.txt）
+    沿用游戏原版车辆脚本的结构，并复用了其中部分模板和数值（每台车约 85–90 行），
+    包括 vehicle_suv_template.txt 的拆装规则、template_glovebox.txt 的手套箱，
+    以及理想L6 由 template_suv_collision.txt 换算出的碰撞箱。这是给本游戏做车辆
+    mod 的通常做法。
+  - 维修配方「Fix LiL6 Trunk Welding」（NEV_LiL6 的 nev_lil6_fixing.txt）和
+    「Fix NEV Roof Rack Welding」（NEVLib 的 nev_fixing.txt）是游戏原版的
+    「Fix Trunk Welding」（vehiclesfixing.txt）换成了别的物品。
+  - 前备箱模板（NEVLib 的 nev_frunk.txt）照游戏原版的后备箱部件
+    （template_trunk.txt 的 TruckBed）写成。
+  - 中控屏物品（NEVLib 的 nev_items.txt 里的 InfotainmentScreen）照抄了游戏原版
+    TvBlack 的设备属性。
+  - 冰箱系数（NEVLib 的 Fridge.lua 里的 FRIDGE_FACTOR、ROT_SPEED）是游戏原版
+    Food.getFridgeFactor / Food.getFoodRotSpeed 里的数值。
+除此之外不包含游戏的任何其他资源（模型、贴图、声音、反编译代码）。mod 里显示的
+游戏图片或模型（例如原版图标）是从游戏本身加载的。
+
+商标
+车型名称仅用于说明 mod 参照的真实车型，商标归各自所有者；本系列 mod 与任何汽车
+厂商无关，也未获得其认可。

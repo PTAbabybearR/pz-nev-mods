@@ -1,0 +1,35 @@
+module Base
+{
+    /* The frunk, every NEV's second storage box (GitHub #306, docs/design/parts/frunk-design.md). A car whose real
+       counterpart has a frunk adds `template = NEVFrunk,` after `template = GloveBox,` (pickup window order, #304 R1)
+       and a later `part NEVFrunk { container { capacity = N, } }` (real litres x 0.175, to the nearest 5).
+       Like the vanilla trunk (template_trunk.txt part TruckBed) with the bonnet in place of the tailgate: reachable on
+       foot in front of the car while the frunk lid (EngineDoor) is open or not fitted (NEVLib.Frunk.access); the
+       vanilla small trunk item plus the car's parts type (specificItem stays true: SmallTrunk1 / 2 / 3), which a new
+       car's create gives the part's capacity; not installable, repaired like the trunk; the condition scales the
+       capacity like the vanilla trunk. */
+    template vehicle NEVFrunk
+    {
+        part NEVFrunk
+        {
+            mechanicArea = Engine,
+            area = Engine,
+            category = bodywork,
+            itemType = Base.SmallTrunk,
+            mechanicRequireKey = true,
+            repairMechanic = true,
+            durability = 5,
+            container
+            {
+                conditionAffectsCapacity = true,
+                test = NEVLib.Frunk.access,
+                soundMap = ContainerPut VehicleTrunkTransferItem,
+                soundMap = ContainerTake VehicleTrunkTransferItem,
+            }
+            lua
+            {
+                create = Vehicles.Create.Default,
+            }
+        }
+    }
+}

@@ -1,0 +1,21 @@
+module Base
+{
+    /* NEV Lib: a silent engine (LEGACY-ISSUES 1 option B, user 2026-10-08 D1).
+       A vehicle script's engine / engineStart / engineTurnOff left empty fall
+       back to the vanilla default engine sound, so NEVs name this instead:
+       the file does not exist, nothing plays and nothing is logged (the KI5
+       way, e.g. 87fordB700_sounds.txt). The range extender's sound is played
+       by NEVLib/RexSound.lua (vanilla generator loop) while it runs. */
+    sound NEVLibSilent
+    {
+        category = Vehicle,
+        clip
+        {
+            file = media/sound/nil,
+            distanceMin = 0,
+            distanceMax = 0,
+            reverbMaxRange = 0,
+            reverbFactor = 0,
+        }
+    }
+}

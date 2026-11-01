@@ -1,0 +1,1748 @@
+module Base
+{
+    /* Li Auto L6 (EREV). Body: the M2 rebuild (c40, 2026-10-11), written into
+       this file by art/common/vehicle/build_mod.py from art/vehicles/lil6/car.json;
+       vehicle attributes DESIGN 5.2, energy DESIGN 5.1 / 5.3.
+       Differences to the vanilla SUV template:
+       - traction battery in the "Battery" part (drainable, specificItem = false)
+       - "Engine" part = drive motor; its update keeps part updates alive
+       - GasTank defined in full: no vanilla burn, no checkEngine (M1-PLAN 2.3)
+       - NEVRangeExtender part (fuel -> electricity), NEVFridge container
+       - no Muffler; engineLoudness 0 (world sound at the Java minimum, 8 tiles)
+       - single-speed drive: gearRatioCount 1 + NEVLib rpm script NEVLib_EV
+         (docs/design/ui/dashboard-design.md 6) */
+    vehicle NEV_LiL6
+    {
+        /* 2: the SUV / off-road class (DESIGN 5.4 P2, revision 15; user 10-13 I-245 Q2,
+           replaces B2 "an SUV is a standard car"). Vanilla trunk / glove box are small,
+           so those two stay L6 items below. */
+        mechanicType = 2,
+        engineRepairLevel = 5,
+        playerDamageProtection = 1.3,
+        /* DESIGN 5.5 off-road ruler: full-time AWD without low range = half way between 2WD and low-range 4WD,
+           grass / road 1.845; this single-speed car reaches it at 0.87 (measured 1.83, tools/perf_rulers.py) */
+        offRoadEfficiency = 0.87,
+        /* official L6 colours, one picked at random per car (M2-V2-DESIGN 2.5) */
+        skin
+        {
+            texture = Vehicles/nev_lil6_shell_purple,
+        }
+        skin
+        {
+            texture = Vehicles/nev_lil6_shell_sand,
+        }
+        skin
+        {
+            texture = Vehicles/nev_lil6_shell_silver,
+        }
+        skin
+        {
+            texture = Vehicles/nev_lil6_shell_elephant,
+        }
+        skin
+        {
+            texture = Vehicles/nev_lil6_shell_white,
+        }
+        skin
+        {
+            texture = Vehicles/nev_lil6_shell_black,
+        }
+        skin
+        {
+            texture = Vehicles/nev_lil6_shell_grey,
+        }
+        textureMask = Vehicles/nev_lil6_mask,
+        textureLights = Vehicles/nev_lil6_lights,
+        textureDamage1Overlay = Vehicles/nev_lil6_blood_mask,
+        textureDamage2Overlay = Vehicles/nev_lil6_blood,
+        textureDamage1Shell = Vehicles/nev_lil6_damage1,
+        textureDamage2Shell = Vehicles/nev_lil6_damage2,
+        textureRust = Vehicles/nev_lil6_rust,
+        textureShadow = Vehicles/nev_lil6_shadow,
+        model
+        {
+            file = NEV_LiL6,
+            scale = 1.82,
+            /* #368 C4 (DESIGN 5.4, revision 43): the origin (the centre of mass when the car uses box physics) lowered -
+               this offset and the 4 physics boxes + 0.080 (14.6 cm) together, so the body, wheels, parts and
+               ground clearance stay where they were (#368 C3 offset list: h0 unchanged) */
+            offset = 0.0 0.3822 0.0,
+        }
+        sound
+        {
+            alarmLoop = VehicleAlarmA VehicleAlarmB VehicleAlarmC VehicleAlarmD VehicleAlarmE,
+            /* silent motor (NEVLib nev_sounds.txt); the range extender plays the
+               vanilla generator loop from NEVLib/RexSound.lua (D1, 2026-10-08) */
+            engine = NEVLibSilent,
+            engineStart = NEVLibSilent,
+            engineTurnOff = NEVLibSilent,
+            horn = VehicleHornStandard,
+            ignitionFail = VehicleIgnitionFailSUV,
+        }
+        extents = 0.9692 0.6374 2.4404,
+        /* DESIGN 5.5 ruler (revision 43, #368 C4): real 2520 kg x k 0.30 (tools/perf_rulers.py) */
+        mass = 756,
+        physicsChassisShape = 0.9692 0.6374 2.4404,
+        /* box branch: only the spawn height and the shadow (VehicleScript, #368 C3 offset list); the reference car's ratio */
+        centerOfMassOffset = 0.0 0.1568 0.0,
+        /* DESIGN 5.5 (revision 43, #368 C4; handling-rulers-design.md 16.2): calibrated on 0-100 - target 7.5 s
+           (user 10-26: 6-8 s), measured 7.38-7.43 s at mass 756 (#368 C4 self check;
+           tools/perf_rulers.py accel). Saved with the car: new cars only (7050 before #368) */
+        engineForce = 5400,
+        gearRatioCount = 1,
+        engineRPMType = NEVLib_EV,
+        /* DESIGN 5.5 (#368 C4, user 2026-10-28 "both agreed"): 130 for every NEV - the steering of the user's reference
+           car (Mustang UBC: clamp 0.3 + 0.6 x (1 - speed / 130), wheel rate 1 - speed / runtime top speed). The speed the
+           car reaches is the ruler's: Register.lua driveMaxKmh 90 is set as the runtime top speed while the throttle is
+           down (NEVLib Parts.applyLimp) -> game about 109.8. Read from the script on load */
+        maxSpeed = 130.0,
+        /* DESIGN 5.5 reverse (#368 C4): the Mustang's 30 (vanilla default 40) - reverse holds at about 20 km/h
+           (CarController:744-748: speed x 1.5 against -maxSpeedReverse). Read from the script on load */
+        maxSpeedReverse = 30.0,
+        engineLoudness = 0,
+        engineQuality = 100,
+        /* not parsed by VehicleScript (VEHICLE-ATTRS 0.2): braking = the brake parts */
+        brakingForce = 48,
+        stoppingMovementForce = 4.0,
+        /* I-242 (player report on v1.0.0, fixed in v1.0.2): with 1.0 a fast turn pushed the outer wheels past the
+           physics' suspension force limit (it grows with the total mass: 1150 + cargo), the body dropped onto the
+           ground and the turn counted as a crash. 0.5 held in the whole speed x steering matrix, empty and fully
+           loaded, both sides (docs/testing/sharp-turn-test-design.md 5); vanilla heavy vehicles also lower it (PickUpVan 0.6).
+           #226 (v1.3.2): 0.5 made braking while steering spin the car; DESIGN 5.4 P6 now takes the roll from the
+           full-load tier: the L6's full load 1557 -> tier 1600 = 0.65 (0.7 crashed at 1600; tools/perf_rulers.py).
+           User 10-19 full load (every container but the driver's seat, all add-ons): estimate 1563, still tier 1600.
+           #368 (DESIGN 5.4 P6 revision 41): the roll follows the top speed (driveMaxKmh, #368 C4) - 90 is in the band 0.95-1.0, the top
+           1.0 (= the vanilla SUV's); the full load stays safe through the lower mass (5.5 x k) and is checked
+           against M_pass (tools/perf_rulers.py).
+           #368 C4 (revision 43, 16.2): the band from 0.80, the value the reference car's 0.98 (the user's trial);
+           full load at top speed, steering full: 0 / 5 at 1474 kg, 0.31 m clear (#368 formal measurement) */
+        rollInfluence = 0.98,
+        steeringIncrement = 0.04,
+        steeringClamp = 0.3,
+        /* #368 C4 (DESIGN 5.4, revision 43; user 10-29: C4 accepted): the reference car's suspension (Mustang UBC,
+           69fordMustangUBC.txt) - rest length and travel in the same game metres (x its scale / ours), stiffness /
+           compression / damping copied. wheelFriction and brakingForce are not parsed (VEHICLE-ATTRS 0.2: the tyre
+           and brake parts decide), copied with it */
+        suspensionStiffness = 37,
+        suspensionCompression = 4.83,
+        suspensionDamping = 3.88,
+        maxSuspensionTravelCm = 7.154,
+        suspensionRestLength = 0.1022,
+        wheelFriction = 1.75,
+        /* no front / rear end durability: the engine does not parse frontEndHealth, and the real key
+           (frontEndDurability) is only a counter - parts are damaged anyway (BaseVehicle.addDamageFront).
+           Removed in v1.0.3 (DESIGN 5.2, user 10-13 A2); a sturdier front comes from armour (PARTS). */
+        seats = 5,
+        wheel FrontLeft
+        {
+            front = true,
+            offset = 0.4193 -0.3626 0.745,
+            radius = 0.1755,
+            width = 0.1261,
+        }
+        wheel FrontRight
+        {
+            front = true,
+            offset = -0.4193 -0.3626 0.745,
+            radius = 0.1755,
+            width = 0.1261,
+        }
+        wheel RearLeft
+        {
+            front = false,
+            offset = 0.4213 -0.3626 -0.699,
+            radius = 0.1755,
+            width = 0.1261,
+        }
+        wheel RearRight
+        {
+            front = false,
+            offset = -0.4213 -0.3626 -0.699,
+            radius = 0.1755,
+            width = 0.1261,
+        }
+        area Engine
+        {
+            xywh = 0.0 1.4564 0.9692 0.4725,
+        }
+        area TruckBed
+        {
+            xywh = 0.0 -1.4564 0.9692 0.4725,
+        }
+        area TireFrontLeft
+        {
+            xywh = 0.7209 0.745 0.4725 0.4725,
+        }
+        area TireFrontRight
+        {
+            xywh = -0.7209 0.745 0.4725 0.4725,
+        }
+        area TireRearLeft
+        {
+            xywh = 0.7209 -0.699 0.4725 0.4725,
+        }
+        area TireRearRight
+        {
+            xywh = -0.7209 -0.699 0.4725 0.4725,
+        }
+        area GasTank
+        {
+            xywh = 0.7209 -0.7657 0.4725 0.4725,
+        }
+        /* Charging port, rear right (mirror of GasTank). A charger must be
+           within 2 tiles of its centre, like vanilla refuelling (NEVLib.Charging). */
+        area ChargePort
+        {
+            xywh = -0.7209 -0.7657 0.4725 0.4725,
+        }
+        template = TrunkDoor,
+        template = Trunk/part/TruckBed,
+        template = Seat/part/SeatFrontLeft,
+        template = Seat/part/SeatFrontRight,
+        template = Seat/part/SeatRearLeft,
+        template = Seat/part/SeatRearRight,
+        template = Battery,
+        template = Engine,
+        template = EngineDoor,
+        template = Heater,
+        template = Windshield/part/Windshield,
+        template = Windshield/part/WindshieldRear,
+        template = Window/part/WindowFrontLeft,
+        template = Window/part/WindowFrontRight,
+        template = Window/part/WindowRearLeft,
+        template = Window/part/WindowRearRight,
+        template = Door/part/DoorFrontLeft,
+        template = Door/part/DoorFrontRight,
+        template = Door/part/DoorRearLeft,
+        template = Door/part/DoorRearRight,
+        template = Tire,
+        template = Brake,
+        template = Suspension,
+        template = Radio,
+        template = Headlight,
+        /* BEGIN C: visual part lines, generated by art/common/legacy_m2/gen_lil6.py (lil6_script.py).
+           Owned by session C; agreed with session A (docs/archive/m2-old-body/M2-V3-DESIGN.md). */
+        part DoorFrontLeft
+        {
+            model Default
+            {
+                file = NEV_LiL6_DoorFL,
+            }
+            anim Open
+            {
+                anim = door_fl_open,
+                rate = 1.0,
+            }
+            anim Close
+            {
+                anim = door_fl_open,
+                reverse = true,
+                rate = 1.5,
+            }
+            anim Opened
+            {
+                anim = door_fl_open,
+                reverse = true,
+                animate = false,
+            }
+            anim Closed
+            {
+                anim = door_fl_open,
+                animate = false,
+            }
+        }
+        part DoorFrontRight
+        {
+            model Default
+            {
+                file = NEV_LiL6_DoorFR,
+            }
+            anim Open
+            {
+                anim = door_fr_open,
+                rate = 1.0,
+            }
+            anim Close
+            {
+                anim = door_fr_open,
+                reverse = true,
+                rate = 1.5,
+            }
+            anim Opened
+            {
+                anim = door_fr_open,
+                reverse = true,
+                animate = false,
+            }
+            anim Closed
+            {
+                anim = door_fr_open,
+                animate = false,
+            }
+        }
+        part DoorRearLeft
+        {
+            model Default
+            {
+                file = NEV_LiL6_DoorRL,
+            }
+            anim Open
+            {
+                anim = door_rl_open,
+                rate = 1.0,
+            }
+            anim Close
+            {
+                anim = door_rl_open,
+                reverse = true,
+                rate = 1.5,
+            }
+            anim Opened
+            {
+                anim = door_rl_open,
+                reverse = true,
+                animate = false,
+            }
+            anim Closed
+            {
+                anim = door_rl_open,
+                animate = false,
+            }
+        }
+        part DoorRearRight
+        {
+            model Default
+            {
+                file = NEV_LiL6_DoorRR,
+            }
+            anim Open
+            {
+                anim = door_rr_open,
+                rate = 1.0,
+            }
+            anim Close
+            {
+                anim = door_rr_open,
+                reverse = true,
+                rate = 1.5,
+            }
+            anim Opened
+            {
+                anim = door_rr_open,
+                reverse = true,
+                animate = false,
+            }
+            anim Closed
+            {
+                anim = door_rr_open,
+                animate = false,
+            }
+        }
+        part EngineDoor
+        {
+            model Default
+            {
+                file = NEV_LiL6_Hood,
+            }
+            anim Open
+            {
+                anim = hood_open,
+                rate = 1.0,
+            }
+            anim Close
+            {
+                anim = hood_open,
+                reverse = true,
+                rate = 1.5,
+            }
+            anim Opened
+            {
+                anim = hood_open,
+                reverse = true,
+                animate = false,
+            }
+            anim Closed
+            {
+                anim = hood_open,
+                animate = false,
+            }
+        }
+        part TrunkDoor
+        {
+            model Default
+            {
+                file = NEV_LiL6_Tailgate,
+            }
+            anim Open
+            {
+                anim = trunk_open,
+                rate = 1.0,
+            }
+            anim Close
+            {
+                anim = trunk_open,
+                reverse = true,
+                rate = 1.5,
+            }
+            anim Opened
+            {
+                anim = trunk_open,
+                reverse = true,
+                animate = false,
+            }
+            anim Closed
+            {
+                anim = trunk_open,
+                animate = false,
+            }
+        }
+        part WindowFrontLeft
+        {
+            model Default
+            {
+                file = NEV_LiL6_WindowFL,
+            }
+            anim ClosedToOpen
+            {
+                anim = window_fl_open,
+                animate = false,
+            }
+            window
+            {
+                openable = true,
+            }
+        }
+        part WindowFrontRight
+        {
+            model Default
+            {
+                file = NEV_LiL6_WindowFR,
+            }
+            anim ClosedToOpen
+            {
+                anim = window_fr_open,
+                animate = false,
+            }
+            window
+            {
+                openable = true,
+            }
+        }
+        part WindowRearLeft
+        {
+            model Default
+            {
+                file = NEV_LiL6_WindowRL,
+            }
+            anim ClosedToOpen
+            {
+                anim = window_rl_open,
+                animate = false,
+            }
+            window
+            {
+                openable = true,
+            }
+        }
+        part WindowRearRight
+        {
+            model Default
+            {
+                file = NEV_LiL6_WindowRR,
+            }
+            anim ClosedToOpen
+            {
+                anim = window_rr_open,
+                animate = false,
+            }
+            window
+            {
+                openable = true,
+            }
+        }
+        part Windshield
+        {
+            model Default
+            {
+                file = NEV_LiL6_Windshield,
+            }
+        }
+        part WindshieldRear
+        {
+            model Default
+            {
+                file = NEV_LiL6_WindshieldRear,
+            }
+            parent = TrunkDoor,
+        }
+        part SeatFrontLeft
+        {
+            model Default
+            {
+                file = NEV_LiL6_SeatFL,
+            }
+        }
+        part SeatFrontRight
+        {
+            model Default
+            {
+                file = NEV_LiL6_SeatFR,
+            }
+        }
+        part SeatRearLeft
+        {
+            model Default
+            {
+                file = NEV_LiL6_SeatRL,
+            }
+        }
+        part SeatRearRight
+        {
+            model Default
+            {
+                file = NEV_LiL6_SeatRR,
+            }
+        }
+        part NEVSeatRearMiddle
+        {
+            model Default
+            {
+                file = NEV_LiL6_SeatRM,
+            }
+            category = seat,
+            itemType = Base.NormalCarSeat,
+            mechanicRequireKey = true,
+            durability = 3,
+            mechanicArea = Interior,
+            area = SeatRearLeft,
+            container
+            {
+                seat = RearMiddle,
+                test = Vehicles.ContainerAccess.Seat,
+                soundMap = ContainerPut VehicleCarseatTransferItem,
+                soundMap = ContainerTake VehicleCarseatTransferItem,
+            }
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 300,
+                skills = Mechanics:2,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.InstallTest.Default,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 300,
+                skills = Mechanics:2,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                requireEmpty = true,
+            }
+            lua
+            {
+                create = Vehicles.Create.Default,
+            }
+        }
+        part TireFrontLeft
+        {
+            model InflatedTirePlusWheel
+            {
+                file = NEV_LiL6_WheelL,
+            }
+        }
+        part TireFrontRight
+        {
+            model InflatedTirePlusWheel
+            {
+                file = NEV_LiL6_WheelR,
+            }
+        }
+        part TireRearLeft
+        {
+            model InflatedTirePlusWheel
+            {
+                file = NEV_LiL6_WheelL,
+            }
+        }
+        part TireRearRight
+        {
+            model InflatedTirePlusWheel
+            {
+                file = NEV_LiL6_WheelR,
+            }
+        }
+        /* END C: visual part lines */
+        /* Glove box: vanilla's GloveBox template written out here instead of "template = GloveBox", so the part
+           comes after the 5th seat (NEVSeatRearMiddle) - the loot window lists container buttons in part order and a
+           template part sits before every part defined in the body (#250). Vanilla cars list the seats before the
+           glove box too (vehicle_*_template.txt). Saved cars match parts by id (VehicleParts.setScript). */
+        part GloveBox
+        {
+            mechanicArea = Interior,
+            area = SeatFrontRight,
+            /* keeps the SUV's 10 (a type-1 glove box holds 3) */
+            itemType = NEV_LiL6.LiL6GloveBox,
+            specificItem = false,
+            mechanicRequireKey = true,
+            durability = 3,
+            container
+            {
+                test = Vehicles.ContainerAccess.GloveBox,
+                soundMap = ContainerClose VehicleGloveboxClose,
+                soundMap = ContainerOpen VehicleGloveboxOpen,
+                soundMap = ContainerPut VehicleGloveboxTransferItem,
+                soundMap = ContainerTake VehicleGloveboxTransferItem,
+            }
+            lua
+            {
+                create = Vehicles.Create.Default,
+            }
+        }
+        part Radio
+        {
+            /* infotainment screen instead of a radio (docs/design/cabin/tv-design.md);
+               part id stays "Radio" so the vanilla dashboard button and
+               device menu keep working */
+            specificItem = false,
+            itemType = NEVLib.InfotainmentScreen;NEVLib.InfotainmentScreenRadio,
+            mechanicArea = SeatFrontLeft,
+            area = SeatFrontLeft,
+            /* sandbox InfotainmentTV off -> radio only (DESIGN 7.5):
+               re-applied on every load and after an install. A "table"
+               merges key by key into the template's, but a "lua" block
+               replaces the template's whole block (server self test
+               screen-hooks), so vanilla's create is repeated; the update
+               wraps vanilla's (screen power, DESIGN 5.3). */
+            table install
+            {
+                complete = NEVLib.Screen.installComplete,
+            }
+            lua
+            {
+                create = Vehicles.Create.Radio,
+                update = NEVLib.Screen.update,
+                init = NEVLib.Screen.init,
+            }
+        }
+        /* Install / uninstall rules of the vanilla SUV template
+           (vehicle_suv_template.txt:136-275), which the generic part
+           templates above do not carry: aligned with the vanilla SUV
+           (user decision 2026-10-07, issue 26). Must follow the template
+           lines - a wildcard part merges into the parts existing so far. */
+        part TrunkDoor
+        {
+            table install
+            {
+                recipes = Intermediate Mechanics,
+            }
+            table uninstall
+            {
+                recipes = Intermediate Mechanics,
+            }
+        }
+        part EngineDoor
+        {
+            table install
+            {
+                recipes = Intermediate Mechanics,
+            }
+            table uninstall
+            {
+                recipes = Intermediate Mechanics,
+            }
+        }
+        part Windshield*
+        {
+            table install
+            {
+                recipes = Intermediate Mechanics,
+            }
+            table uninstall
+            {
+                recipes = Intermediate Mechanics,
+            }
+        }
+        part Window*
+        {
+            table install
+            {
+                recipes = Intermediate Mechanics,
+            }
+            table uninstall
+            {
+                recipes = Intermediate Mechanics,
+            }
+        }
+        part Door*
+        {
+            table install
+            {
+                recipes = Intermediate Mechanics,
+            }
+            table uninstall
+            {
+                recipes = Intermediate Mechanics,
+            }
+        }
+        part Brake*
+        {
+            table install
+            {
+                skills = Mechanics:6,
+                recipes = Intermediate Mechanics,
+            }
+            table uninstall
+            {
+                skills = Mechanics:6,
+                recipes = Intermediate Mechanics,
+            }
+        }
+        part Suspension*
+        {
+            table install
+            {
+                skills = Mechanics:6,
+                recipes = Intermediate Mechanics,
+            }
+            table uninstall
+            {
+                skills = Mechanics:6,
+                recipes = Intermediate Mechanics,
+            }
+        }
+        part Battery
+        {
+            /* specificItem defaults to true and would look for
+               NEV_LiL6.TractionBattery2 (VehicleScript.java:654, DESIGN 13.5-3).
+               The library's three EREV batteries (DESIGN 5.1 revision 17; a new car spawns with one of them,
+               NEVLib.Battery.create) and the v1.0-v1.2 L6 battery, kept for old saves (never spawned or made) */
+            specificItem = false,
+            itemType = NEVLib.TractionBatteryEREV_Low;NEVLib.TractionBatteryEREV_Mid;NEVLib.TractionBatteryEREV_High;NEV_LiL6.TractionBattery,
+            /* Install / uninstall (user decisions 2026-10-07, issue 25):
+               Electricity 2, screwdriver + wrench, time 300. The keys merge
+               into the vanilla Battery template's tables (VehicleScript.
+               LoadTable): item 1 (screwdriver) stays, item 2 adds the wrench.
+               Like every vanilla part the skill is not a hard gate: below
+               level 2 the success chance drops (VehicleUtils.
+               calculateInstallationSuccess: level 0 = 50 %, 1 = 65 %). */
+            table install
+            {
+                items
+                {
+                    2
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                    }
+                }
+                time = 300,
+                skills = Electricity:2,
+            }
+            table uninstall
+            {
+                items
+                {
+                    2
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                    }
+                }
+                time = 300,
+                skills = Electricity:2,
+                /* vanilla rule + not while camping / charging (DESIGN 9) */
+                test = NEVLib.Parts.batteryUninstallTest,
+            }
+            lua
+            {
+                create = NEVLib.Parts.createBattery,
+                update = NEVLib.Parts.updateBattery,
+            }
+        }
+        part Engine
+        {
+            lua
+            {
+                create = Vehicles.Create.Engine,
+                update = NEVLib.Parts.updateMotor,
+                checkEngine = Vehicles.CheckEngine.Engine,
+            }
+        }
+        part GasTank
+        {
+            mechanicArea = Back,
+            area = GasTank,
+            category = gastank,
+            /* the vanilla small / normal / big tanks of the parts class (type 2: 55 / 65 / 75 L;
+               DESIGN 5.2 revision 15, user 10-14 "no special cases"; replaces B4's one 49 L tank) */
+            itemType = Base.SmallGasTank;Base.NormalGasTank;Base.BigGasTank,
+            mechanicRequireKey = true,
+            durability = 5,
+            container
+            {
+                test = Vehicles.ContainerAccess.GasTank,
+                contentType = Gasoline,
+                conditionAffectsCapacity = true,
+            }
+            lua
+            {
+                create = Vehicles.Create.GasTank,
+                update = NEVLib.Parts.updateGasTank,
+            }
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = secondary,
+                    }
+                    2
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:7,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.InstallTest.Default,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = secondary,
+                    }
+                    2
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:7,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                requireEmpty = true,
+            }
+        }
+        part NEVRangeExtender
+        {
+            mechanicArea = Engine,
+            area = Engine,
+            category = engine,
+            itemType = NEVLib.RangeExtender,
+            specificItem = false,
+            mechanicRequireKey = true,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 800,
+                skills = Mechanics:5,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.InstallTest.Default,
+                door = EngineDoor,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 800,
+                skills = Mechanics:5,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+            }
+            lua
+            {
+                create = NEVLib.Parts.createRangeExtender,
+                update = NEVLib.Parts.updateRangeExtender,
+            }
+        }
+        part Heater
+        {
+            category = engine,
+            lua
+            {
+                update = NEVLib.Parts.updateHeater,
+            }
+        }
+        part PassengerCompartment
+        {
+            category = nodisplay,
+            lua
+            {
+                update = Vehicles.Update.PassengerCompartment,
+            }
+        }
+        part NEVFridge
+        {
+            mechanicArea = Interior,
+            area = SeatFrontLeft,
+            /* the library fridge (DESIGN 9 revision 17, every NEV) and the vanilla glove box of the v1.0-v1.2 L6
+               (Base.GloveBox2: the old part added the mechanicType), kept so old saves keep their fridge; a new car
+               gets NEVLib.Fridge (NEVLib.Parts.createFridge). Capacity: this car's (the container below). */
+            specificItem = false,
+            itemType = NEVLib.Fridge;Base.GloveBox2,
+            mechanicRequireKey = true,
+            durability = 3,
+            container
+            {
+                capacity = 10,
+                test = NEVLib.Parts.fridgeAccess,
+            }
+            lua
+            {
+                create = NEVLib.Parts.createFridge,
+                update = NEVLib.Parts.updateFridge,
+            }
+        }
+        part TruckBed
+        {
+            /* L6 trunk 100 (VEHICLE-ATTRS 2.4): between the SUV's 85 and a van's 130 */
+            itemType = NEV_LiL6.LiL6Trunk,
+            specificItem = false,
+            container
+            {
+                test = Vehicles.ContainerAccess.TruckBedOpenInside,
+            }
+        }
+        part Seat*
+        {
+            table install
+            {
+                skills = Mechanics:2,
+                recipes = Intermediate Mechanics,
+            }
+            table uninstall
+            {
+                skills = Mechanics:2,
+                recipes = Intermediate Mechanics,
+            }
+        }
+        /* BEGIN armour add-ons (DESIGN 9.1 revision 17, #215): parts, install rules, spawn chances
+           (NEVLib.Armor.create reads Register.lua armorSpawn, normal grade only). Items are the library's SUV
+           class ones, "normal;Fine" - the normal grade first (NEVLib.Armor.createNormal). No car model yet - the
+           art pass adds the model lines. After the template and wildcard lines, so the window locks merge last. */
+        part NEVArmorWindowFrontLeft
+        {
+            model Default
+            {
+                file = NEV_LiL6_OptWindowFL,
+            }
+            parent = DoorFrontLeft,
+            area = SeatFrontLeft,
+            mechanicArea = Left,
+            category = bodywork,
+            itemType = NEVLib.SUV_WindowGuard;NEVLib.SUV_WindowGuard_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                requireInstalled = WindowFrontLeft,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVArmorWindowFrontRight
+        {
+            model Default
+            {
+                file = NEV_LiL6_OptWindowFR,
+            }
+            parent = DoorFrontRight,
+            area = SeatFrontRight,
+            mechanicArea = Right,
+            category = bodywork,
+            itemType = NEVLib.SUV_WindowGuard;NEVLib.SUV_WindowGuard_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                requireInstalled = WindowFrontRight,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVArmorWindowRearLeft
+        {
+            model Default
+            {
+                file = NEV_LiL6_OptWindowRL,
+            }
+            model Quarter
+            {
+                file = NEV_LiL6_OptWindowRLQuarter,
+            }
+            parent = DoorRearLeft,
+            area = SeatRearLeft,
+            mechanicArea = Left,
+            category = bodywork,
+            itemType = NEVLib.SUV_WindowGuard;NEVLib.SUV_WindowGuard_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                requireInstalled = WindowRearLeft,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVArmorWindowRearRight
+        {
+            model Default
+            {
+                file = NEV_LiL6_OptWindowRR,
+            }
+            model Quarter
+            {
+                file = NEV_LiL6_OptWindowRRQuarter,
+            }
+            parent = DoorRearRight,
+            area = SeatRearRight,
+            mechanicArea = Right,
+            category = bodywork,
+            itemType = NEVLib.SUV_WindowGuard;NEVLib.SUV_WindowGuard_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                requireInstalled = WindowRearRight,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 500,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVArmorWindshield
+        {
+            model Default
+            {
+                file = NEV_LiL6_OptWindshieldFront,
+            }
+            area = Engine,
+            mechanicArea = Engine,
+            category = bodywork,
+            itemType = NEVLib.SUV_WindshieldArmor;NEVLib.SUV_WindshieldArmor_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 550,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                requireInstalled = Windshield,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 550,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVArmorWindshieldRear
+        {
+            model Default
+            {
+                file = NEV_LiL6_OptWindshieldRear,
+            }
+            parent = TrunkDoor,
+            area = TruckBed,
+            mechanicArea = Back,
+            category = bodywork,
+            itemType = NEVLib.SUV_WindshieldRearArmor;NEVLib.SUV_WindshieldRearArmor_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 700,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                requireInstalled = WindshieldRear,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:screwdriver,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 700,
+                skills = Mechanics:4,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVBullbarFront
+        {
+            model Default
+            {
+                file = NEV_LiL6_OptBullbarFront,
+            }
+            model Cat
+            {
+                file = NEV_LiL6_OptBullbarFrontCat,
+            }
+            setAllModelsVisible = false,
+            area = Engine,
+            mechanicArea = Engine,
+            category = bodywork,
+            itemType = NEVLib.SUV_BullbarFront;NEVLib.SUV_BullbarFront_Fine;NEVLib.SUV_BullbarFront_Cat,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 450,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 450,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVBullbarRear
+        {
+            model Default
+            {
+                file = NEV_LiL6_OptBullbarRear,
+            }
+            model Cat
+            {
+                file = NEV_LiL6_OptBullbarRearCat,
+            }
+            /* #296: the upper piece of the split rear bar, skinned to trunk_bone; parent = TrunkDoor so it is drawn by the
+               lid's animation player and swings with it. NEVLib.Armor.applyModels shows it only while the lid is installed. */
+            model DefaultTrunk
+            {
+                file = NEV_LiL6_OptBullbarRearTrunk,
+            }
+            model CatTrunk
+            {
+                file = NEV_LiL6_OptBullbarRearTrunkCat,
+            }
+            parent = TrunkDoor,
+            setAllModelsVisible = false,
+            area = TruckBed,
+            mechanicArea = Back,
+            category = bodywork,
+            itemType = NEVLib.SUV_BullbarRear;NEVLib.SUV_BullbarRear_Fine;NEVLib.SUV_BullbarRear_Cat,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 450,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 450,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVRoofRack
+        {
+            model Default
+            {
+                file = NEV_LiL6_OptRoofRack,
+            }
+            area = TruckBed,
+            mechanicArea = Back,
+            category = bodywork,
+            itemType = NEVLib.SUV_RoofRack,
+            specificItem = false,
+            durability = 5,
+            container
+            {
+                capacity = 50,
+                test = NEVLib.Armor.roofRackAccess,
+            }
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 1500,
+                skills = Mechanics:1,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 1500,
+                skills = Mechanics:1,
+                recipes = Intermediate Mechanics,
+                requireEmpty = true,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part WindowFrontLeft
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVArmorWindowFrontLeft,
+            }
+        }
+        part WindowFrontRight
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVArmorWindowFrontRight,
+            }
+        }
+        part WindowRearLeft
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVArmorWindowRearLeft,
+            }
+        }
+        part WindowRearRight
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVArmorWindowRearRight,
+            }
+        }
+        part Windshield
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVArmorWindshield,
+            }
+        }
+        part WindshieldRear
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVArmorWindshieldRear,
+            }
+        }
+        /* END armour add-ons */
+        attachment trailer
+        {
+            offset = 0.0 -0.3002 -1.2421,
+            rotate = 0.0 0.0 0.0,
+            zoffset = -1.0,
+        }
+        attachment trailerfront
+        {
+            offset = 0.0 -0.3002 1.2477,
+            rotate = 0.0 0.0 0.0,
+            zoffset = 1.0,
+        }
+        template = PassengerSeat4,
+        /* own collision (B1: the SUVCollision template's boxes are for the 3.82 m body).
+           Generated from vanilla template_suv_collision.txt through art/common/legacy_m2/lil6_stretch.py:
+           axis-aligned boxes map both ends, the sloped ones (windshield / tailgate) move their
+           centre and grow by the local stretch. check_lil6 keeps them on the body. */
+        useChassisPhysicsCollision = false,
+        physics box
+        {
+            offset = 0.0 0.267 -0.0011,
+            extents = 0.9862 0.3679 2.4456,
+            rotate = 0.0 0.0 0.0,
+        }
+        physics box
+        {
+            offset = 0.0 0.5084 0.8832,
+            extents = 0.9197 0.1149 0.601,
+            rotate = 0.0 0.0 0.0,
+        }
+        physics box
+        {
+            offset = 0.0 0.6414 -0.2031,
+            extents = 0.9539 0.3809 1.5644,
+            rotate = 0.0 0.0 0.0,
+        }
+        physics box
+        {
+            offset = 0.0 0.6072 -1.0966,
+            extents = 0.8619 0.3125 0.2184,
+            rotate = 0.0 0.0 0.0,
+        }
+        passenger FrontLeft
+        {
+            hasRoof = true,
+            switchSeat RearMiddle
+            {
+                anim = Climb_WindowB,
+                rate = 0.23,
+                sound = VehicleChangeSeat,
+            }
+            position inside
+            {
+                offset = 0.183 -0.0048 0.1268,
+                rotate = 0.0 0.0 0.0,
+            }
+            position outside
+            {
+                offset = 0.6549 -0.4925 0.2046,
+                rotate = 0.0 0.0 0.0,
+                area = SeatFrontLeft,
+            }
+        }
+        passenger FrontRight
+        {
+            hasRoof = true,
+            switchSeat RearMiddle
+            {
+                anim = Climb_WindowB,
+                rate = 0.23,
+                sound = VehicleChangeSeat,
+            }
+            position inside
+            {
+                offset = -0.183 -0.0048 0.1268,
+                rotate = 0.0 0.0 0.0,
+            }
+            position outside
+            {
+                offset = -0.6549 -0.4925 0.2046,
+                rotate = 0.0 0.0 0.0,
+                area = SeatFrontRight,
+            }
+        }
+        passenger RearLeft
+        {
+            hasRoof = true,
+            switchSeat RearMiddle
+            {
+                anim = Climb_WindowB,
+                rate = 0.23,
+                sound = VehicleChangeSeat,
+            }
+            position inside
+            {
+                offset = 0.2126 0.0101 -0.3281,
+                rotate = 0.0 0.0 0.0,
+            }
+            position outside
+            {
+                offset = 0.6549 -0.4925 -0.3447,
+                rotate = 0.0 0.0 0.0,
+                area = SeatRearLeft,
+            }
+        }
+        passenger RearRight
+        {
+            hasRoof = true,
+            switchSeat RearMiddle
+            {
+                anim = Climb_WindowB,
+                rate = 0.23,
+                sound = VehicleChangeSeat,
+            }
+            position inside
+            {
+                offset = -0.2126 0.0101 -0.3281,
+                rotate = 0.0 0.0 0.0,
+            }
+            position outside
+            {
+                offset = -0.6549 -0.4925 -0.3447,
+                rotate = 0.0 0.0 0.0,
+                area = SeatRearRight,
+            }
+        }
+        passenger RearMiddle
+        {
+            /* 5th seat (L6 is a five-seater); in and out through the rear left door */
+            hasRoof = true,
+            door = DoorRearLeft,
+            area = SeatRearLeft,
+            position inside
+            {
+                offset = 0.0 0.0101 -0.3281,
+                rotate = 0.0 0.0 0.0,
+            }
+            position outside
+            {
+                offset = 0.6549 -0.4925 -0.3447,
+                rotate = 0.0 0.0 0.0,
+                area = SeatRearLeft,
+            }
+            switchSeat RearLeft
+            {
+                anim = Climb_WindowB,
+                rate = 0.23,
+                sound = VehicleChangeSeat,
+            }
+            switchSeat RearRight
+            {
+                anim = Climb_WindowB,
+                rate = 0.23,
+                sound = VehicleChangeSeat,
+            }
+            switchSeat FrontLeft
+            {
+                anim = Climb_WindowB,
+                rate = 0.23,
+                sound = VehicleChangeSeat,
+            }
+            switchSeat FrontRight
+            {
+                anim = Climb_WindowB,
+                rate = 0.23,
+                sound = VehicleChangeSeat,
+            }
+        }
+        area SeatFrontLeft
+        {
+            xywh = 0.7209 0.2046 0.4725 0.4725,
+        }
+        area SeatFrontRight
+        {
+            xywh = -0.7209 0.2046 0.4725 0.4725,
+        }
+        area SeatRearLeft
+        {
+            xywh = 0.7209 -0.3447 0.4725 0.4725,
+        }
+        area SeatRearRight
+        {
+            xywh = -0.7209 -0.3447 0.4725 0.4725,
+        }
+        shadowExtents = 0.9692 2.4404,
+        shadowOffset = 0.0 0.0,
+    }
+
+    model NEV_LiL6
+    {
+        mesh = vehicles/NEV_LiL6|LiL6_body,
+        shader = vehicle_norandom_multiuv_noreflect,
+        invertX = false,
+        scale = 0.000494505495,
+    }
+}

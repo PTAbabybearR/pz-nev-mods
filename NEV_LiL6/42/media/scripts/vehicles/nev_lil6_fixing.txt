@@ -1,0 +1,18 @@
+module Base
+{
+    /* #335: the L6 trunk (TruckBed) fits its own item NEV_LiL6.LiL6Trunk (capacity 100, nev_lil6_items.txt), which
+       vanilla's Fix Trunk Welding does not list, so the mechanics menu had no "Repair" for it (vanilla needs a fixing
+       whose Require names the fitted item's full type). This is vanilla's Fix Trunk Welding
+       (media/scripts/generated/vehicles/vehiclesfixing.txt, B42) for that item only, under its own name so it does
+       not replace vanilla's. Module Base only to match vanilla: another module works the same (the repair menu
+       builds "<fixing module>.<fixer>", e.g. Base.Base.SheetMetal, and ScriptBucket.get looks a dotted name up
+       globally). */
+    fixing Fix LiL6 Trunk Welding
+    {
+        Require = NEV_LiL6.LiL6Trunk,
+        GlobalItem = Base.BlowTorch=2,
+        ConditionModifier = 1.2,
+        Fixer = Base.SheetMetal; MetalWelding=3;Mechanics=2,
+        Fixer = Base.SmallSheetMetal=2; MetalWelding=3;Mechanics=2,
+    }
+}

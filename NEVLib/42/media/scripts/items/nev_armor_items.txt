@@ -1,0 +1,470 @@
+module NEVLib
+{
+    imports
+    {
+        Base
+    }
+
+    /* Armour add-ons by vehicle class (DESIGN 9.1 revision 17, #215; PARTS-SIMPLIFY-DESIGN 4.1 / 4.2): one set
+       of items per class (DESIGN 5.4), NEVLib.<Class>_<Piece>; a model pack only names them in its vehicle script
+       and gives the car model. This version: the SUV class (the L6).
+       Two grades of armour (4.3): normal, and Fine (suffix _Fine, tag nev:finearmor) that pays a hit / 1.2
+       (NEVLib.Armor) - same weight, same car model; only made by hand, never spawned. The roof rack does not
+       protect and has no grade. Never found in containers, never spawn damaged; made with the welding recipes in
+       nev_armor_recipes.txt after reading the class manual. Tag nev:metalarmor: the library's repair recipe.
+       Icons Item_NEV_<item> (Fine: same picture + gold corner badge); ground models NEV_<item> (Fine = its normal one),
+       docs/vehicles/lil6/art/options-record-s5.md. */
+
+    /* Window grille: one item for all four side windows; protects its window and keeps the zombies from
+       grabbing the seat behind it. */
+    item SUV_WindowGuard
+    {
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 6.0,
+        Icon = NEV_SUV_WindowGuard,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 40.0,
+        WorldStaticModel = NEV_SUV_WindowGuard,
+        Tags = base:hasmetal;nev:metalarmor,
+    }
+
+    item SUV_WindowGuard_Fine
+    {
+        Tooltip = Tooltip_NEV_FineArmor,
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 6.0,
+        Icon = NEV_SUV_WindowGuard_Fine,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 60.0,
+        WorldStaticModel = NEV_SUV_WindowGuard,
+        Tags = base:hasmetal;nev:metalarmor;nev:finearmor,
+    }
+
+    item SUV_WindshieldArmor
+    {
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 12.0,
+        Icon = NEV_SUV_WindshieldArmor,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 80.0,
+        WorldStaticModel = NEV_SUV_WindshieldArmor,
+        Tags = base:hasmetal;nev:metalarmor,
+    }
+
+    item SUV_WindshieldArmor_Fine
+    {
+        Tooltip = Tooltip_NEV_FineArmor,
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 12.0,
+        Icon = NEV_SUV_WindshieldArmor_Fine,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 120.0,
+        WorldStaticModel = NEV_SUV_WindshieldArmor,
+        Tags = base:hasmetal;nev:metalarmor;nev:finearmor,
+    }
+
+    item SUV_WindshieldRearArmor
+    {
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 10.0,
+        Icon = NEV_SUV_WindshieldRearArmor,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 70.0,
+        WorldStaticModel = NEV_SUV_WindshieldRearArmor,
+        Tags = base:hasmetal;nev:metalarmor,
+    }
+
+    item SUV_WindshieldRearArmor_Fine
+    {
+        Tooltip = Tooltip_NEV_FineArmor,
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 10.0,
+        Icon = NEV_SUV_WindshieldRearArmor_Fine,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 105.0,
+        WorldStaticModel = NEV_SUV_WindshieldRearArmor,
+        Tags = base:hasmetal;nev:metalarmor;nev:finearmor,
+    }
+
+    /* Front bull bar: the car's front layer (hood, drive motor, headlights). */
+    item SUV_BullbarFront
+    {
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 10.0,
+        Icon = NEV_SUV_BullbarFront,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 80.0,
+        WorldStaticModel = NEV_SUV_BullbarFront,
+        Tags = base:hasmetal;nev:metalarmor,
+    }
+
+    item SUV_BullbarFront_Fine
+    {
+        Tooltip = Tooltip_NEV_FineArmor,
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 10.0,
+        Icon = NEV_SUV_BullbarFront_Fine,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 120.0,
+        WorldStaticModel = NEV_SUV_BullbarFront,
+        Tags = base:hasmetal;nev:metalarmor;nev:finearmor,
+    }
+
+    /* Rear bull bar: the car's rear layer (tailgate, tail lights, gas tank); longer brackets clear the tailgate. */
+    item SUV_BullbarRear
+    {
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 12.0,
+        Icon = NEV_SUV_BullbarRear,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 90.0,
+        WorldStaticModel = NEV_SUV_BullbarRear,
+        Tags = base:hasmetal;nev:metalarmor,
+    }
+
+    item SUV_BullbarRear_Fine
+    {
+        Tooltip = Tooltip_NEV_FineArmor,
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 12.0,
+        Icon = NEV_SUV_BullbarRear_Fine,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 135.0,
+        WorldStaticModel = NEV_SUV_BullbarRear,
+        Tags = base:hasmetal;nev:metalarmor;nev:finearmor,
+    }
+
+    /* Cat-ear easter egg bull bars (DESIGN 9.1, #229): the flat-top bull bar with cat ears at both ends; only spawned
+       with a car (a tenth of the spawned bull bars, NEVLib.Armor.createSpawned), no recipe, not in containers, pays like
+       the normal grade (no nev:finearmor). Same weight as the normal bar. */
+    item SUV_BullbarFront_Cat
+    {
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 10.0,
+        Icon = NEV_SUV_BullbarFront_Cat,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 80.0,
+        WorldStaticModel = NEV_SUV_BullbarFront_Cat,
+        Tags = base:hasmetal;nev:metalarmor,
+    }
+
+    item SUV_BullbarRear_Cat
+    {
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 12.0,
+        Icon = NEV_SUV_BullbarRear_Cat,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 90.0,
+        WorldStaticModel = NEV_SUV_BullbarRear_Cat,
+        Tags = base:hasmetal;nev:metalarmor,
+    }
+
+    /* Roof rack: a 50-capacity container on the roof; no protection, no grade. */
+    item SUV_RoofRack
+    {
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 20.0,
+        Icon = NEV_SUV_RoofRack,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 60.0,
+        WorldStaticModel = NEV_SUV_RoofRack,
+        Tags = base:hasmetal,
+    }
+
+    /* SUV tire guard (DESIGN 9.1 revision 21, #286; pickup-armor-design 5.5): the pickup one for the SUV class, same
+       numbers (tools/check_static.py SAME_AS). Art: version c (user 10-18), 745 mm for the L6's tire. */
+    item SUV_TireGuard
+    {
+        Tooltip = Tooltip_NEV_TireGuard,
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 6.0,
+        Icon = NEV_SUV_TireGuard,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 40.0,
+        WorldStaticModel = NEV_SUV_TireGuard,
+        Tags = base:hasmetal;nev:metalarmor,
+    }
+
+    item SUV_TireGuard_Fine
+    {
+        Tooltip = Tooltip_NEV_TireGuardFine,
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 6.0,
+        Icon = NEV_SUV_TireGuard_Fine,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 60.0,
+        WorldStaticModel = NEV_SUV_TireGuard,
+        Tags = base:hasmetal;nev:metalarmor;nev:finearmor,
+    }
+
+    /* The class manual (PARTS-SIMPLIFY-DESIGN 4.4): teaches every armour / add-on recipe of the class, both
+       grades. Weight, boredom and stress as the vanilla mechanics magazines (literature.txt MechanicMag1-3);
+       found where they are, at 1/4 of their weight (NEVLib/Distributions.lua). */
+    item Manual_SUV
+    {
+        DisplayCategory = RecipeResource,
+        ItemType = base:literature,
+        Weight = 0.5,
+        Icon = MagazineMechanic2,
+        BoredomChange = -20,
+        StressChange = -15,
+        LearnedRecipes = NEVMakeSUVWindowGuard;NEVMakeSUVWindowGuardFine;NEVMakeSUVWindshieldArmor;NEVMakeSUVWindshieldArmorFine;NEVMakeSUVWindshieldRearArmor;NEVMakeSUVWindshieldRearArmorFine;NEVMakeSUVBullbarFront;NEVMakeSUVBullbarFrontFine;NEVMakeSUVBullbarRear;NEVMakeSUVBullbarRearFine;NEVMakeSUVRoofRack;NEVMakeSUVTireGuard;NEVMakeSUVTireGuardFine,
+        StaticModel = Magazine,
+        WorldStaticModel = MagazineMec2Ground,
+        Tags = base:magazine,
+    }
+
+    /* Pickup class (DESIGN 9.1 revision 21, #272; docs/design/parts/pickup-armor-design.md 4.1): weights and grades as
+       the SUV pieces; no cat-ear easter egg (user 10-18). Door armour plate = the window grille's job on the four
+       window parts (user 10-18), one item for the four doors; tire guard (new) protects one tire, one item for four.
+       Tire guard art is final (version c, user 10-18; art/items/tire_guard_export.py). The other six: ground models and
+       icons generated from the Cybertruck pieces on the car (#273 v9, craft B1; art/vehicles/cybertruck/options/ground_ct.py). */
+    item Pickup_DoorArmor
+    {
+        Tooltip = Tooltip_NEV_DoorArmor,
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 6.0,
+        Icon = NEV_Pickup_DoorArmor,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 40.0,
+        WorldStaticModel = NEV_Pickup_DoorArmor,
+        Tags = base:hasmetal;nev:metalarmor,
+    }
+
+    item Pickup_DoorArmor_Fine
+    {
+        Tooltip = Tooltip_NEV_DoorArmorFine,
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 6.0,
+        Icon = NEV_Pickup_DoorArmor_Fine,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 60.0,
+        WorldStaticModel = NEV_Pickup_DoorArmor,
+        Tags = base:hasmetal;nev:metalarmor;nev:finearmor,
+    }
+
+    item Pickup_WindshieldArmor
+    {
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 12.0,
+        Icon = NEV_Pickup_WindshieldArmor,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 80.0,
+        WorldStaticModel = NEV_Pickup_WindshieldArmor,
+        Tags = base:hasmetal;nev:metalarmor,
+    }
+
+    item Pickup_WindshieldArmor_Fine
+    {
+        Tooltip = Tooltip_NEV_FineArmor,
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 12.0,
+        Icon = NEV_Pickup_WindshieldArmor_Fine,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 120.0,
+        WorldStaticModel = NEV_Pickup_WindshieldArmor,
+        Tags = base:hasmetal;nev:metalarmor;nev:finearmor,
+    }
+
+    item Pickup_WindshieldRearArmor
+    {
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 10.0,
+        Icon = NEV_Pickup_WindshieldRearArmor,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 70.0,
+        WorldStaticModel = NEV_Pickup_WindshieldRearArmor,
+        Tags = base:hasmetal;nev:metalarmor,
+    }
+
+    item Pickup_WindshieldRearArmor_Fine
+    {
+        Tooltip = Tooltip_NEV_FineArmor,
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 10.0,
+        Icon = NEV_Pickup_WindshieldRearArmor_Fine,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 105.0,
+        WorldStaticModel = NEV_Pickup_WindshieldRearArmor,
+        Tags = base:hasmetal;nev:metalarmor;nev:finearmor,
+    }
+
+    item Pickup_BullbarFront
+    {
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 10.0,
+        Icon = NEV_Pickup_BullbarFront,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 80.0,
+        WorldStaticModel = NEV_Pickup_BullbarFront,
+        Tags = base:hasmetal;nev:metalarmor,
+    }
+
+    item Pickup_BullbarFront_Fine
+    {
+        Tooltip = Tooltip_NEV_FineArmor,
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 10.0,
+        Icon = NEV_Pickup_BullbarFront_Fine,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 120.0,
+        WorldStaticModel = NEV_Pickup_BullbarFront,
+        Tags = base:hasmetal;nev:metalarmor;nev:finearmor,
+    }
+
+    item Pickup_BullbarRear
+    {
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 12.0,
+        Icon = NEV_Pickup_BullbarRear,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 90.0,
+        WorldStaticModel = NEV_Pickup_BullbarRear,
+        Tags = base:hasmetal;nev:metalarmor,
+    }
+
+    item Pickup_BullbarRear_Fine
+    {
+        Tooltip = Tooltip_NEV_FineArmor,
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 12.0,
+        Icon = NEV_Pickup_BullbarRear_Fine,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 135.0,
+        WorldStaticModel = NEV_Pickup_BullbarRear,
+        Tags = base:hasmetal;nev:metalarmor;nev:finearmor,
+    }
+
+    item Pickup_RoofRack
+    {
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 20.0,
+        Icon = NEV_Pickup_RoofRack,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 60.0,
+        WorldStaticModel = NEV_Pickup_RoofRack,
+        Tags = base:hasmetal,
+    }
+
+    item Pickup_TireGuard
+    {
+        Tooltip = Tooltip_NEV_TireGuard,
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 6.0,
+        Icon = NEV_Pickup_TireGuard,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 40.0,
+        WorldStaticModel = NEV_Pickup_TireGuard,
+        Tags = base:hasmetal;nev:metalarmor,
+    }
+
+    item Pickup_TireGuard_Fine
+    {
+        Tooltip = Tooltip_NEV_TireGuardFine,
+        DisplayCategory = VehicleMaintenance,
+        ItemType = base:normal,
+        Weight = 6.0,
+        Icon = NEV_Pickup_TireGuard_Fine,
+        ChanceToSpawnDamaged = 0,
+        ConditionMax = 100,
+        MechanicsItem = true,
+        MetalValue = 60.0,
+        WorldStaticModel = NEV_Pickup_TireGuard,
+        Tags = base:hasmetal;nev:metalarmor;nev:finearmor,
+    }
+
+    item Manual_Pickup
+    {
+        DisplayCategory = RecipeResource,
+        ItemType = base:literature,
+        Weight = 0.5,
+        Icon = MagazineMechanic2,
+        BoredomChange = -20,
+        StressChange = -15,
+        LearnedRecipes = NEVMakePickupDoorArmor;NEVMakePickupDoorArmorFine;NEVMakePickupWindshieldArmor;NEVMakePickupWindshieldArmorFine;NEVMakePickupWindshieldRearArmor;NEVMakePickupWindshieldRearArmorFine;NEVMakePickupBullbarFront;NEVMakePickupBullbarFrontFine;NEVMakePickupBullbarRear;NEVMakePickupBullbarRearFine;NEVMakePickupRoofRack;NEVMakePickupTireGuard;NEVMakePickupTireGuardFine,
+        StaticModel = Magazine,
+        WorldStaticModel = MagazineMec2Ground,
+        Tags = base:magazine,
+    }
+}
