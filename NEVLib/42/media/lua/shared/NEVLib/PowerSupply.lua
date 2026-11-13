@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: power supply interface for the stand-alone accessory modules
 -- (fridge, air filter; DESIGN 4 / 7.1). Accessories only talk to this table,
 -- never to the battery or powertrain code, so they can later move into a

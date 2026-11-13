@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: debug / admin "repair vehicle" and "repair part" on a new-energy car (GitHub #232).
 -- Vanilla VehiclePart.repair (42.x, decompiled line 976) fills an EMPTY part with a random entry of its itemType
 -- and calls its init: on our parts that is the Fine grade or the cat ears of an armour add-on, the old L6 battery,

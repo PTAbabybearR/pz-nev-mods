@@ -1,3 +1,9 @@
+/* Copyright (c) 2026 熊叔
+   This Source Code Form is subject to the terms of the Mozilla Public
+   License, v. 2.0. If a copy of the MPL was not distributed with this
+   file, You can obtain one at https://mozilla.org/MPL/2.0/.
+   Parts of this file reuse Project Zomboid content, (c) The Indie Stone; those
+   parts are not covered by this licence. See NOTICE.txt. */
 module Base
 {
     /* Li Auto L6 (EREV). Body: the M2 rebuild (c40, 2026-10-11), written into
@@ -1507,6 +1513,233 @@ module Base
                 init = NEVLib.Armor.init,
             }
         }
+        /* Tire guards (#287, design pickup-armor-design.md 5; the library's SUV class items, as the Cybertruck's
+           #273): drawn with the wheel (wheel = ..., moves / steers / spins with it), fit after the tire, the tire
+           comes off only after the guard (the locks below). Never spawned with the car (armorSpawn: none). */
+        part NEVTireGuardFrontLeft
+        {
+            model Default
+            {
+                file = NEV_LiL6_OptTireGuardL,
+            }
+            wheel = FrontLeft,
+            area = TireFrontLeft,
+            mechanicArea = Left,
+            category = tire,
+            itemType = NEVLib.SUV_TireGuard;NEVLib.SUV_TireGuard_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 400,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                requireInstalled = TireFrontLeft,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 400,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVTireGuardFrontRight
+        {
+            model Default
+            {
+                file = NEV_LiL6_OptTireGuardR,
+            }
+            wheel = FrontRight,
+            area = TireFrontRight,
+            mechanicArea = Right,
+            category = tire,
+            itemType = NEVLib.SUV_TireGuard;NEVLib.SUV_TireGuard_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 400,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                requireInstalled = TireFrontRight,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 400,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVTireGuardRearLeft
+        {
+            model Default
+            {
+                file = NEV_LiL6_OptTireGuardL,
+            }
+            wheel = RearLeft,
+            area = TireRearLeft,
+            mechanicArea = Left,
+            category = tire,
+            itemType = NEVLib.SUV_TireGuard;NEVLib.SUV_TireGuard_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 400,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                requireInstalled = TireRearLeft,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 400,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
+        part NEVTireGuardRearRight
+        {
+            model Default
+            {
+                file = NEV_LiL6_OptTireGuardR,
+            }
+            wheel = RearRight,
+            area = TireRearRight,
+            mechanicArea = Right,
+            category = tire,
+            itemType = NEVLib.SUV_TireGuard;NEVLib.SUV_TireGuard_Fine,
+            specificItem = false,
+            durability = 5,
+            table install
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 400,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                requireInstalled = TireRearRight,
+                test = Vehicles.InstallTest.Default,
+                complete = NEVLib.Armor.installComplete,
+            }
+            table uninstall
+            {
+                items
+                {
+                    1
+                    {
+                        tags = base:wrench,
+                        count = 1,
+                        keep = true,
+                        equip = primary,
+                    }
+                }
+                time = 400,
+                skills = Mechanics:3,
+                recipes = Intermediate Mechanics,
+                test = Vehicles.UninstallTest.Default,
+                complete = Vehicles.UninstallComplete.Default,
+            }
+            lua
+            {
+                create = NEVLib.Armor.create,
+                init = NEVLib.Armor.init,
+            }
+        }
         part WindowFrontLeft
         {
             table uninstall
@@ -1547,6 +1780,34 @@ module Base
             table uninstall
             {
                 requireUninstalled = NEVArmorWindshieldRear,
+            }
+        }
+        part TireFrontLeft
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVTireGuardFrontLeft,
+            }
+        }
+        part TireFrontRight
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVTireGuardFrontRight,
+            }
+        }
+        part TireRearLeft
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVTireGuardRearLeft,
+            }
+        }
+        part TireRearRight
+        {
+            table uninstall
+            {
+                requireUninstalled = NEVTireGuardRearRight,
             }
         }
         /* END armour add-ons */

@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- Tesla Cybertruck, Premium All-Wheel Drive (BEV pickup): model configuration for NEV Lib (DESIGN 5, 13.3;
 -- numbers docs/vehicles/cybertruck/design/stats-design.md). Ships with v2.0: the pack carries UNRELEASED.txt until then.
 -- Energy numbers are the reference draws; this car's own energyScale scales the time-based ones at load

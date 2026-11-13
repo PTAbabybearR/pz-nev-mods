@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: which paint a newly spawned car wears (DESIGN 10.1a, GitHub #228, user 2026-10-16: "the wraps stay as
 -- rare spawns, stainless as the ordinary one"). Generic: a model pack lists its rare skins in Register.lua
 --     rarePaints = { "stealth_black", ... }

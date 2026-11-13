@@ -1,3 +1,7 @@
+/* Copyright (c) 2026 熊叔
+   This Source Code Form is subject to the terms of the Mozilla Public
+   License, v. 2.0. If a copy of the MPL was not distributed with this
+   file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 module Base
 {
     /* NEV Lib: a silent engine (LEGACY-ISSUES 1 option B, user 2026-10-08 D1).
@@ -9,6 +13,72 @@ module Base
     sound NEVLibSilent
     {
         category = Vehicle,
+        clip
+        {
+            file = media/sound/nil,
+            distanceMin = 0,
+            distanceMax = 0,
+            reverbMaxRange = 0,
+            reverbFactor = 0,
+        }
+    }
+
+    /* Vehicle-to-load (#180, v2l-design.md 3.2): the invisible generator's
+       tile names this prefix (GeneratorSound = NEVLibV2L, art/items/gen_tiles.py);
+       vanilla plays <prefix>Loop / Starting / Stopping / Backfire /
+       FailedToStart (IsoGenerator.getSoundPrefix, playGeneratorSound) - all
+       silent, the NEVLibSilent way. */
+    sound NEVLibV2LLoop
+    {
+        category = Object,
+        clip
+        {
+            file = media/sound/nil,
+            distanceMin = 0,
+            distanceMax = 0,
+            reverbMaxRange = 0,
+            reverbFactor = 0,
+        }
+    }
+    sound NEVLibV2LStarting
+    {
+        category = Object,
+        clip
+        {
+            file = media/sound/nil,
+            distanceMin = 0,
+            distanceMax = 0,
+            reverbMaxRange = 0,
+            reverbFactor = 0,
+        }
+    }
+    sound NEVLibV2LStopping
+    {
+        category = Object,
+        clip
+        {
+            file = media/sound/nil,
+            distanceMin = 0,
+            distanceMax = 0,
+            reverbMaxRange = 0,
+            reverbFactor = 0,
+        }
+    }
+    sound NEVLibV2LBackfire
+    {
+        category = Object,
+        clip
+        {
+            file = media/sound/nil,
+            distanceMin = 0,
+            distanceMax = 0,
+            reverbMaxRange = 0,
+            reverbFactor = 0,
+        }
+    }
+    sound NEVLibV2LFailedToStart
+    {
+        category = Object,
         clip
         {
             file = media/sound/nil,

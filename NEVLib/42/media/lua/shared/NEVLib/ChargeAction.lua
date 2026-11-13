@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: "plug in the charger" (DESIGN 6.1, user decision 2026-10-07).
 -- Like vanilla refuelling (ISVehiclePartMenu.onPumpGasoline): the character
 -- first walks to the vehicle's charging port area, then does a short action

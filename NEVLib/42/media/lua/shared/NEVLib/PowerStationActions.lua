@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: portable power station timed actions (DESIGN 6.4).
 --  * NEVPowerStationChargeAction: charge it where it is placed on the ground
 --    (user 2026-10-07: like the vanilla car battery charger), standing next
@@ -243,6 +248,9 @@ function NEVPowerStationToCarAction:isValid()
         return false
     end
     if self.worldObj and not NEVLib.Charging.portReaches(self.vehicle, self.worldObj:getSquare()) then return false end
+    -- #396 (v2l-design 3.14 option A): the server refuses a car with vehicle-to-load unlocked whatever the
+    -- client's menu showed (toCarStep also moves nothing into it)
+    if PowerStation.cannotGive(self.item, self.vehicle) == "stationV2L" then return false end
     return true
 end
 

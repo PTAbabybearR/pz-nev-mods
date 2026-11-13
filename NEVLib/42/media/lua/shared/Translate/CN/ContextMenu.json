@@ -4,5 +4,9 @@
     "ContextMenu_NEV_SlowCharge": "开始慢充（充电桩）",
     "ContextMenu_NEV_CarFromStation": "用储能电源补电（%1 kWh）",
     "ContextMenu_NEV_PowerStationToCar": "给附近的新能源车补电（%1 kWh）",
-    "ContextMenu_NEV_PowerStationCharge": "给储能电源充电（现在 %1 / %2 kWh）"
+    "ContextMenu_NEV_PowerStationCharge": "给储能电源充电（现在 %1 / %2 kWh）",
+    "ContextMenu_NEV_V2LUnlock": "解锁车辆外放电功能",
+    "ContextMenu_NEV_V2LStart": "开始外放电",
+    "ContextMenu_NEV_V2LStop": "停止外放电（剩 %1%%，约 %2 小时）",
+    "ContextMenu_NEV_V2LStopShort": "停止外放电（剩 %1%%）"
 }

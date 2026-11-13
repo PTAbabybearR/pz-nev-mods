@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: armour add-ons (docs/vehicles/lil6/design/parts-options-design.md section 6, v1.3, GitHub #174; U5 section 3).
 -- A model pack declares which armour part protects which parts (Registry key `armor`); the library does
 -- the rest. Vanilla B42 has no hook before a part loses condition (every path is Java), so armour works
@@ -347,11 +352,33 @@ function Armor.createSpawned(part)
     return Armor.createNormal(part)
 end
 
+-- Old saves (#392, user 11-04 "老存档不补装", DESIGN 9.1): a part the car's save does not have (an add-on of a later
+-- version, e.g. the roof rack on an L6 saved by v1.0-v1.2) gets `create` when the car is read back, the same call as
+-- on a new car (VehicleParts.createParts runs it for every part with created == false). There it stays empty instead
+-- of rolling, so a save reads the same every time. The car tells the two apart only before that: createPhysics fires
+-- OnSpawnVehicleStart while the car's own `created` is still false for a new car and true for one read from a save,
+-- and sets it right after - so it is kept per car from Start to OnSpawnVehicleEnd. A createPhysics that returns
+-- early fires Start without End; the car's next Start overwrites what it left.
+local fromSave = setmetatable({}, { __mode = "k" })   -- vehicle -> true while a car read from a save is created
+Armor.fromSave = fromSave   -- tests
+
+function Armor.onSpawnStart(vehicle)
+    if vehicle then fromSave[vehicle] = vehicle:isCreated() or nil end
+end
+
+function Armor.onSpawnEnd(vehicle)
+    if vehicle then fromSave[vehicle] = nil end
+end
+
 -- Spawn with the car at the model pack's chance (Registry key `armorSpawn` = { [part id] = 0..1 },
--- PARTS-DESIGN 6.6), normal grade only; otherwise the part starts empty. Vanilla has no such field: the create
--- function decides (Vehicles.Create.Default always makes the item). The part must have an install table, or
--- VehicleParts resets `created` and rolls again on every load.
+-- PARTS-DESIGN 6.6), normal grade only; otherwise the part starts empty - and always empty on a car read from a
+-- save (above). Vanilla has no such field: the create function decides (Vehicles.Create.Default always makes the
+-- item). The part must have an install table, or VehicleParts resets `created` and rolls again on every load.
 function Armor.create(vehicle, part)
+    if fromSave[vehicle] then
+        part:setInventoryItem(nil)
+        return
+    end
     local cfg = Registry.get(vehicle)
     local chance = cfg and cfg.armorSpawn and cfg.armorSpawn[part:getId()] or 0
     if chance > 0 and ZombRandFloat(0, 1) < chance then
@@ -500,5 +527,8 @@ function Armor.onRepairCreate(data, character)
     item:setCondition(math.min(item:getConditionMax(), item:getCondition() + Armor.REPAIR_POINTS))
     item:syncItemFields()   -- multiplayer: as vanilla RecipeCodeOnCreate.minorCondition does
 end
+
+Events.OnSpawnVehicleStart.Add(Util.guardKeep("Armor.onSpawnStart", Armor.onSpawnStart))
+Events.OnSpawnVehicleEnd.Add(Util.guardKeep("Armor.onSpawnEnd", Armor.onSpawnEnd))
 
 return Armor

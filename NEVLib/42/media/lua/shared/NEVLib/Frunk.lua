@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: the frunk, every NEV's second storage box (GitHub #306, docs/design/parts/frunk-design.md). A car pack adds
 -- it with two script lines: `template = NEVFrunk,` (the library's vehicle template, scripts/vehicles/nev_frunk.txt)
 -- and the part's container capacity. This is the template's container test.

@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: sandbox options (DESIGN 10) with defaults. Everything reads options
 -- through here so tests can inject values and a missing page never errors.
 require "NEVLib/Util"
@@ -20,6 +25,8 @@ Config.DEFAULTS = {
     GeneratorFuelFactor = 1.0, -- x the charger / power station load, 0 - 10 (DESIGN 6.3 revision 14)
     ParkedRecharge = true,    -- a parked EREV below 3 % starts its range extender (DESIGN 3.5 revision 15, D2)
     FridgeOffCarHours = 24,   -- the fridge works this long after power-off, 0 = no limit (DESIGN 7.1 revision 15, C5)
+    V2LCutoff = 20,           -- vehicle-to-load stops at this charge, % (15 - 80; #180, v2l-design.md 3.6)
+    ZombieWakeRadius = 15,    -- asleep in an NEV: a zombie this many tiles away wakes the player, 0 = off (DESIGN 11, #182)
 }
 
 Config.overrides = nil -- tests: table of option -> value

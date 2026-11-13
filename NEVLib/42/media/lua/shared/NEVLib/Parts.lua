@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: vehicle part Lua functions referenced from the vehicle scripts.
 -- Java calls a part's update with the minutes since its last update; after
 -- the area was unloaded that is one large catch-up value (M0-REPORT 1-6).
@@ -14,10 +19,12 @@ require "NEVLib/Charging"
 require "NEVLib/Camping"
 require "NEVLib/Fridge"
 require "NEVLib/Screen"
+require "NEVLib/V2L"
 
 local Util, Config, Registry, State, Battery, Powertrain, Power, Charging, Camping, Fridge =
     NEVLib.Util, NEVLib.Config, NEVLib.Registry, NEVLib.State, NEVLib.Battery, NEVLib.Powertrain, NEVLib.Power,
     NEVLib.Charging, NEVLib.Camping, NEVLib.Fridge
+local V2L = NEVLib.V2L
 local Parts = {}
 NEVLib.Parts = Parts
 
@@ -44,14 +51,15 @@ Fridge.onReopen = function(vehicle) tellDriver(vehicle, "IGUI_NEV_FridgeReopened
 
 -- Uninstall test of the traction battery (DESIGN 9, REVIEW 3.1-3): vanilla's
 -- rule (not while the engine runs, Vehicles.UninstallTest.Battery) plus not
--- while camping or charging - the parked car uses the battery then too.
+-- while camping, charging or powering the area (V2L) - the parked car uses
+-- the battery then too.
 -- Without the vanilla test (renamed in a game update) nothing is removable,
 -- which shows up at once instead of silently allowing it.
 function Parts.batteryUninstallTest(vehicle, part, chr)
     local base = vanilla("UninstallTest", "Battery")
     if not base or not base(vehicle, part, chr) then return false end
     local st = State.get(vehicle)
-    return st.camping ~= true and st.charge == nil
+    return st.camping ~= true and st.charge == nil and not (st.v2l and st.v2l.on)
 end
 
 -- The battery item is gone (debug uninstall, another player, ...) although
@@ -62,6 +70,7 @@ function Parts.batteryGone(vehicle)
     local st = State.get(vehicle)
     if st.charge then Charging.stop(vehicle, "noBattery") end
     if st.camping then Camping.set(vehicle, false, "noBattery") end
+    if st.v2l and st.v2l.on then V2L.stop(vehicle, "noBattery") end
 end
 
 Parts.createBattery = Battery.create
@@ -109,13 +118,17 @@ function Parts.updateBattery(vehicle, part, elapsedMinutes)
         Charging.stop(vehicle, stopReason)
         chargeKW = 0
     end
+    -- powering the area (V2L, v2l-design 3.5): what vanilla's generator burnt since the last write, in kWh; the
+    -- checks inside may end the mode first (moved, generator gone)
+    local v2lKWh, v2lGen, v2lEmptied = V2L.beforeUpdate(vehicle)
+    local v2lOn = v2lGen ~= nil
 
     -- parked recharge (DESIGN 3.5 revision 15, #138 / I-230): powered off, not camping, not charging and
     -- below 3 % -> the range extender may run until its hold rule stops it (fuel priority 20 % + the band);
     -- only a start below 3 % counts, a car parked while its extender ran does not keep charging by itself
     -- with fuel and a working range extender only (DESIGN 3.5); without them the trigger set and cleared itself
     -- on every update and logged a start / end pair each time (#172, found reading the v1.0 save sample)
-    local parked = cfg.powertrain == "EREV" and not running and not camping and st.charge == nil
+    local parked = cfg.powertrain == "EREV" and not running and not camping and st.charge == nil and not v2lOn
         and Config.get("ParkedRecharge") ~= false and fuelOf(vehicle) > 0 and rexHealthy(vehicle)
     if not parked then
         st.parkedRex = nil
@@ -131,7 +144,8 @@ function Parts.updateBattery(vehicle, part, elapsedMinutes)
         rex = { mode = st.mode, holdSoc = st.holdSoc, speed = speed,
                 wasOn = st.rexOn == true, fuelL = fuel, kw = Powertrain.rexOutputKW(cfg, st.mode),
                 fuelKWhPerL = cfg.rexFuelKWhPerL, healthy = rexHealthy(vehicle),
-                allowed = running or camping or st.parkedRex == true }
+                allowed = running or camping or st.parkedRex == true or v2lOn,
+                floor = v2lOn and V2L.rexFloor(V2L.cutoff()) or nil }
     end
 
     local soc0 = Battery.getSoc(vehicle) -- the exact charge, not the item's whole steps (M3-3 N-1)
@@ -147,9 +161,14 @@ function Parts.updateBattery(vehicle, part, elapsedMinutes)
     local screenKW = NEVLib.Screen.drawKW(vehicle) * acc
     -- a home charger on generator power runs while the generator's fuel lasts
     -- and pays its load for the time it charged (DESIGN 6.3 revision 14); a
-    -- fast charge is vanilla's pump, which vanilla bills itself
+    -- fast charge is vanilla's pump, which vanilla bills itself. #396 (v2l-design 3.14): a car with
+    -- vehicle-to-load unlocked pays by the kWh instead, slow and fast alike, as far as the fuel pays for
     local generator, chargeKWhMax = nil, nil
-    if chargeKW > 0 and st.charge and st.charge.kind == "slow" then
+    local perKWh = chargeKW > 0 and st.charge ~= nil and Charging.paysPerKWh(vehicle)
+    if perKWh then
+        generator = Charging.generatorFor(Charging.sourceSquare(st.charge))
+        chargeKWhMax = generator and Charging.kwhLeft(generator)
+    elseif chargeKW > 0 and st.charge and st.charge.kind == "slow" then
         generator = Charging.generatorFor(Charging.sourceSquare(st.charge))
         local hours = generator and Charging.hoursLeft(generator, Registry.CHARGER_LOAD)
         if hours then chargeKWhMax = hours * chargeKW end
@@ -170,6 +189,7 @@ function Parts.updateBattery(vehicle, part, elapsedMinutes)
         -- speeding up costs the kinetic energy gained (BALANCE-DESIGN 2-3)
         soc = math.max(0, soc - Powertrain.accelKWh(cfg, st.lastSpeed or 0, speed) / cap)
     end
+    if v2lKWh > 0 then soc = math.max(0, soc - v2lKWh / cap) end
     Battery.setSoc(vehicle, soc)
 
     -- empty battery, range extender running: limit the speed to what it
@@ -201,7 +221,7 @@ function Parts.updateBattery(vehicle, part, elapsedMinutes)
             st.parkedRex = nil
             Util.log("REX", { event = "parkedEnd", soc = soc })
         end
-        local wanted = rex.allowed and Powertrain.rexDecide(st.mode, soc, speed, false, st.holdSoc)
+        local wanted = rex.allowed and Powertrain.rexDecide(st.mode, soc, speed, false, st.holdSoc, rex.floor)
         if wanted and not out.rexOn and (not rex.healthy or fuel - out.fuelUsedL <= 0) then
             if not st.rexWarned then
                 st.rexWarned = true
@@ -226,7 +246,16 @@ function Parts.updateBattery(vehicle, part, elapsedMinutes)
     end
     st.lastSpeed = speed
 
-    if generator then Charging.burnFuel(generator, out.chargedKWh / chargeKW, Registry.CHARGER_LOAD) end
+    if generator and perKWh then
+        Charging.burnFuelKWh(generator, out.chargedKWh)
+    elseif generator then
+        Charging.burnFuel(generator, out.chargedKWh / chargeKW, Registry.CHARGER_LOAD)
+    end
+    if v2lOn then
+        -- the range extender keeps the mode on at the cutoff while it supplies (v2l-design 3.1)
+        local supplying = out.rexOn and rex ~= nil and rex.healthy and fuel - out.fuelUsedL > 0
+        V2L.afterUpdate(vehicle, v2lGen, part, soc, cap, supplying, elapsedMinutes, v2lEmptied)
+    end
     if out.full then Charging.stop(vehicle, "full") end
     if out.campingExit then
         Camping.set(vehicle, false, "lowCharge")
@@ -236,6 +265,7 @@ function Parts.updateBattery(vehicle, part, elapsedMinutes)
     -- nobody inside but still powered: the driver died or was dragged out, and
     -- no OnExitVehicle reached us (M1-3 issue 1). Last one out -> off.
     if vehicle:isEngineRunning() and Parts.occupantCount(vehicle) == 0 then Power.evaluate(vehicle, "empty") end
+    Parts.lightsLowOff(vehicle, elapsedMinutes)
     if not live then
         Util.log("CATCHUP", { minutes = elapsedMinutes, soc0 = soc0, soc = soc, charged = chargeKW > 0,
                               rexMin = out.rexMinutes, camping = camping })
@@ -244,8 +274,25 @@ function Parts.updateBattery(vehicle, part, elapsedMinutes)
     if isServer and isServer() and Parts.syncSignature(st) ~= sig0 then vehicle:transmitModData() end
 end
 
+-- Headlights left on while powered off (keepLights, DESIGN 3.3 revision 45, #389) go off below LIGHTS_OFF_SOC. Only on
+-- a car with the setting on (user 11-03, relayed by coordinator 8: only the cars with the setting on): with it off,
+-- lights switched on in a powered-off car stay vanilla's and run the battery down. The
+-- battery part updates before the headlight parts (script order: template Battery before template Headlight; L2 self
+-- test part-order), so vanilla's drain over these minutes is estimated first: one that would cross the line - a long
+-- catch-up after the area was unloaded too - is taken down to the line here and the lights go off, and the headlight
+-- parts updating next take nothing.
+function Parts.lightsLowOff(vehicle, elapsedMinutes)
+    local st = State.get(vehicle)
+    if st.keepLights ~= true or vehicle:isEngineRunning() or st.camping == true or not vehicle:getHeadlightsOn() then return end
+    local soc = Battery.getSoc(vehicle)
+    if soc - Power.lightsDrainSoc(vehicle, elapsedMinutes) >= Power.LIGHTS_OFF_SOC then return end
+    if soc > Power.LIGHTS_OFF_SOC then Battery.setSoc(vehicle, Power.LIGHTS_OFF_SOC) end
+    vehicle:setHeadlightsOn(false)
+    Util.log("LIGHTS", { event = "lowOff", soc = soc, minutes = elapsedMinutes })
+end
+
 -- Every game minute: keep part updates running for the loaded NEVs that have a fridge / charger / camping /
--- range extender working (vanilla's engine update switches them off, see updateMotor). #253 (v1.3.2, a dedicated
+-- range extender / headlights working (vanilla's engine update switches them off, see updateMotor). #253 (v1.3.2, a dedicated
 -- server of 20-50 players measured it): the 1.3.1 kick scanned 41 x 41 squares around every online player, about
 -- 0.9 ms each, all in one tick; now the loaded NEVs are listed as they appear - a part init when the car is loaded
 -- or spawned (VehicleParts.initParts, BaseVehicle.createPhysics: every load, server and single player; the screen
@@ -284,9 +331,12 @@ end
 function Parts.syncSignature(st)
     local c = st.charge
     local k = st.kwhPerKm
+    local v = st.v2l   -- vehicle-to-load: the menu reads unlocked / on / the load / the last stop reason
     return table.concat({ tostring(st.rexOn == true), tostring(st.mode), tostring(st.camping == true),
                           tostring(c and c.kind), tostring(st.holdSoc), tostring(st.limpKmh),
-                          k and string.format("%.3f", k) or "nil" }, "|")
+                          k and string.format("%.3f", k) or "nil",
+                          v and tostring(v.unlocked == true) or "nil", v and tostring(v.on == true) or "nil",
+                          v and tostring(v.kw) or "nil", v and tostring(v.stop) or "nil" }, "|")
 end
 
 -- The empty-battery speed limit (DESIGN 5.3 U2) on the vehicle the physics
@@ -355,7 +405,11 @@ Battery.updateFn = Parts.updateBattery
 -- update after the pause is settled as paused, Fridge.update).
 function Parts.needsLiveUpdates(vehicle)
     local st = State.get(vehicle)
-    if st.camping or st.charge or st.rexOn then return true end
+    if st.camping or st.charge or st.rexOn or (st.v2l and st.v2l.on) then return true end
+    -- headlights lit with the setting on (keepLights, #389): the low-charge rule above runs in the battery update. Lit:
+    -- at least one headlight part with its bulb (the switch alone, every bulb taken out, drains nothing - #253 cost).
+    -- With the setting off the rule does nothing, so nothing to keep running for
+    if st.keepLights == true and Power.lightsDrainSoc(vehicle, 1) > 0 then return true end
     local fp = Fridge.part(vehicle)
     return Fridge.isOn(fp) and not Fridge.isPaused(fp)
 end

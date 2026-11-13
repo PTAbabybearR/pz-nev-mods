@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: power on / off instead of ignition (DESIGN 3.3), plus camping
 -- mode's "cabin powered, engine off" state (DESIGN 7.2).
 --
@@ -5,7 +10,8 @@
 --   drive   : engine Running (engineDoRunning, no start-up, M0 V1)
 --   camping : engine off (no 8-tile engine noise), cabin systems powered
 --   off     : engine off, every device off except the fridge (unless the
---             vehicle setting exitAllOff is on); the device state is
+--             vehicle setting exitAllOff is on) and the headlights (when the
+--             vehicle setting keepLights is on, #389); the device state is
 --             remembered and restored on the next power-on
 -- No manual power on / off since UI-DESIGN 19 (getting in powers on, the
 -- last one out powers off); manualOn is the menu's power-on (manual power-off was removed
@@ -17,6 +23,7 @@ require "NEVLib/Util"
 require "NEVLib/Registry"
 require "NEVLib/State"
 require "NEVLib/Battery"
+require "NEVLib/Powertrain"
 
 local Util, Registry, State, Battery = NEVLib.Util, NEVLib.Registry, NEVLib.State, NEVLib.Battery
 local Power = {}
@@ -27,16 +34,20 @@ NEVLib.Power = Power
 ---------------------------------------------------------------------------
 
 -- s = { current = "drive"|"camping"|"off", occupants, driverCanPower,
---       camping, soc, motorOk, batteryPresent, rexAvailable }
+--       camping, soc, motorOk, batteryPresent, rexAvailable, v2l }
 -- rexAvailable: a range extender with fuel can supply the car, so an empty
 -- battery does not stop it (UI-DESIGN 22.5, user 2026-10-07: "battery or
 -- fuel, either one non-empty, and the car drives").
+-- v2l: the car powers its area (V2L, v2l-design 3.1): a real blocker, not
+-- like camping - requestDrive does not end it, the driver is refused.
 -- returns target state and, when the driver cannot power on, the reason.
 function Power.decide(s)
     -- camping needs the battery it runs on (REVIEW 3.1-3: removed while camping)
     if s.camping and s.batteryPresent then return "camping" end
     local blocker = nil
-    if not s.batteryPresent then
+    if s.v2l then
+        blocker = "v2l"
+    elseif not s.batteryPresent then
         blocker = "noBattery"
     elseif not s.motorOk then
         blocker = "motorBroken"
@@ -94,6 +105,7 @@ function Power.situation(vehicle)
         motorOk = motor ~= nil and motor:getCondition() > 0,
         batteryPresent = bpart ~= nil,
         rexAvailable = Power.rexAvailable(vehicle),
+        v2l = st.v2l ~= nil and st.v2l.on == true,
     }
 end
 
@@ -165,8 +177,35 @@ function Power.snapshot(vehicle)
     return snap
 end
 
-function Power.devicesOff(vehicle)
-    vehicle:setHeadlightsOn(false)
+-- Headlights left on at power-off (DESIGN 3.3 revision 45, #389): the vehicle setting keepLights, when nobody is left
+-- inside (the setting is "after leaving": a power-off with someone still seated - motor broken, key taken - turns them
+-- off as before), unless "leaving turns off every device" is on too (it wins, user Q4) or the charge is already below
+-- the line they go off at (Q3). Below LIGHTS_OFF_SOC they go off while powered off (Parts.updateBattery), the line
+-- camping leaves at.
+Power.LIGHTS_OFF_SOC = NEVLib.Powertrain.CAMPING_EXIT_SOC
+function Power.keepsLights(st, soc, occupants)
+    return st.keepLights == true and occupants == 0 and st.exitAllOff ~= true and soc >= Power.LIGHTS_OFF_SOC
+end
+
+-- Vanilla's headlight drain with the engine off (DESIGN 3.1 revision 45): Vehicles.Update.Headlight takes 0.000025 of
+-- the battery per minute for each lit headlight part, and VehicleUtils.chargeBattery adds that delta twice. A part
+-- is lit with an item in it (and its light) while the battery has charge (Update.Headlight: not with
+-- getBatteryCharge() <= 0, so a battery taken out leaves nothing lit, design review 8.3-3). Battery share `minutes`
+-- of them take.
+Power.HEADLIGHT_DRAIN = 0.00005
+Power.HEADLIGHT_PARTS = { "HeadlightLeft", "HeadlightRight", "HeadlightRearLeft", "HeadlightRearRight" }
+function Power.lightsDrainSoc(vehicle, minutes)
+    if not vehicle:getHeadlightsOn() or vehicle:getBatteryCharge() <= 0 then return 0 end
+    local n = 0
+    for _, id in ipairs(Power.HEADLIGHT_PARTS) do
+        local p = vehicle:getPartById(id)
+        if p and p:getLight() and p:getInventoryItem() then n = n + 1 end
+    end
+    return n * Power.HEADLIGHT_DRAIN * minutes
+end
+
+function Power.devicesOff(vehicle, keepLights)
+    if not keepLights then vehicle:setHeadlightsOn(false) end
     local rd = radioData(vehicle)
     if rd then
         -- infotainment screen: a playing tape stops and stays inside (StopPlayMedia sends itself)
@@ -210,6 +249,7 @@ local REASON_TEXT = {
     noBattery = "IGUI_NEV_NoBattery",
     motorBroken = "IGUI_NEV_MotorBroken",
     noCharge = "IGUI_NEV_NoCharge",
+    v2l = "IGUI_NEV_Reason_V2LOn",
 }
 
 function Power.reasonKey(reason)
@@ -264,7 +304,7 @@ local function enter(vehicle, from, to, st)
         end
     else -- off
         st.snap = Power.snapshot(vehicle)
-        Power.devicesOff(vehicle)
+        Power.devicesOff(vehicle, Power.keepsLights(st, (Battery.getSoc(vehicle)), Power.occupants(vehicle)))
         -- vehicle setting "leaving turns off every device" (UI-DESIGN 19): the
         -- fridge too, back on at the next power-on like the other devices
         local Fridge = NEVLib.Fridge

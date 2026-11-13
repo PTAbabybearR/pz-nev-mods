@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: per-vehicle state kept in the vehicle's modData (saved with the
 -- game). Versioned so later releases can migrate old saves (M1-PLAN 2.14).
 require "NEVLib/Util"
@@ -19,6 +24,8 @@ local function fresh()
         v = State.VERSION,
         mode = "ev",
         exitAllOff = false, -- vehicle setting: leaving the car turns off every device, fridge too (UI-DESIGN 19)
+        keepLights = false, -- vehicle setting: the headlights stay as they were at power-off (#389); add-only field, no migration
+        engineSoundOff = false, -- vehicle setting: the simulated engine sound is off (#236); add-only field, no migration (nil = on)
         holdSoc = nil,      -- fuel priority: SOC to hold (captured when switching)
         snap = nil,         -- devices remembered at power-off
         camping = false,
@@ -26,6 +33,7 @@ local function fresh()
         parkedRex = nil,    -- parked recharge running (DESIGN 3.5 revision 15); add-only field, no migration
         charge = nil,       -- { kind = "fast"|"slow", x, y, z, sx, sy, sprite }
         kwhPerKm = nil,     -- moving average for the range estimate
+        v2l = nil,          -- vehicle-to-load (#180): { unlocked, wearK, on, gx, gy, gz, fuelW, kw, stop }; add-only field, none = locked
         poweredOnce = nil,  -- #319: powered on (drive / camping) at least once; add-only field, old saves: Battery.everPowered
         lastSpeed = 0,
     }

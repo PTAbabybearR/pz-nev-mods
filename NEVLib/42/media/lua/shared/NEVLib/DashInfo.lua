@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: what the NEV dashboard shows (docs/design/ui/dashboard-design.md 2-4), without any
 -- drawing, so the unit tests cover it. Dashboard.lua (client) draws it.
 require "NEVLib/Util"

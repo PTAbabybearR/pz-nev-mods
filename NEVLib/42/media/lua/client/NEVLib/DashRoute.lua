@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: which driver's dashboard the player sees (docs/design/ui/dashboard-design.md 25.3, 25.5, #339).
 -- User 10-23: on our cars only our dashboard, on other cars never ours; 15:02: this is about the driver's dashboard
 -- only - any other seat is left to the other mods.

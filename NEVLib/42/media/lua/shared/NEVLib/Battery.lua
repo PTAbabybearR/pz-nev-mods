@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: traction battery. It occupies the vanilla "Battery" part (DESIGN
 -- 3.1), so the game's own lights / radio / dashboard read it through
 -- getBatteryCharge(). The item must be drainable; the part script must say

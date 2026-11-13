@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: our own dashboard panel (docs/design/ui/dashboard-design.md 25, #339). An ISPanel of its own, not
 -- vanilla's ISVehicleDashboard class or instance: a mod that replaces that class can neither remove nor overdraw it.
 -- NEVLib/DashRoute decides when it is shown; NEVLib/Dashboard lays it out and draws it.
@@ -83,8 +88,10 @@ function Panel:createChildren()
     self.radioTex.mouseovertext = getText("Tooltip_Dashboard_Radio")
     local reg = getTexture("media/ui/vehicles/speedregulator_light.png")
     self.speedregulatorTex = image(self, reg, reg:getWidthOrig(), reg:getHeightOrig())
-    self.speedregulatorTex.mouseovertext = getText("Tooltip_Dashboard_SpeedRegulator", Keyboard.getKeyName(Keyboard.KEY_LSHIFT),
-        Keyboard.getKeyName(getCore():getKey(KeybindId.FORWARD)), Keyboard.getKeyName(getCore():getKey(KeybindId.BACKWARD)))
+    -- vanilla 42.22 :97 names the keys with the global getKeyName (#372): the translated name (IGUI_Key_*) and a
+    -- mouse button bound to a key (code >= 10000), where Keyboard.getKeyName indexes its 256 names and throws
+    self.speedregulatorTex.mouseovertext = getText("Tooltip_Dashboard_SpeedRegulator", getKeyName(Keyboard.KEY_LSHIFT),
+        getKeyName(getCore():getKey(KeybindId.FORWARD)), getKeyName(getCore():getKey(KeybindId.BACKWARD)))
 end
 
 ---------------------------------------------------------------------------

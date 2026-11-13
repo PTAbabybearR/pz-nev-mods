@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: infotainment screen (DESIGN 7.5, docs/design/cabin/tv-design.md). The screen
 -- item sits in the vanilla "Radio" part, and the vanilla radio code turns the
 -- part into a television that plays VHS tapes. What vanilla does not do:

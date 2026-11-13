@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: armour models follow the car's state (shared/NEVLib/Armor.lua Armor.applyModels): bull bars the installed
 -- item (#229 cat-ear easter egg; the part scripts set setAllModelsVisible = false, so nothing shows a bull bar but
 -- this), window armour the window (#317: hidden while its window is rolled down). The NEVs around the local player

@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: energy modes of range-extended cars (DESIGN 3.5, UI-DESIGN 18 W4,
 -- user decision 2026-10-07).
 --   Three modes: "ev" (range extender only below 3 %), "hybrid", "fuel".

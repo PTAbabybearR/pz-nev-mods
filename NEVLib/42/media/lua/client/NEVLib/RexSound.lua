@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: what the player hears from an NEV (DESIGN 3.6, LEGACY-ISSUES 1,
 -- user 2026-10-08 D1). The engine sound is silent (NEVLibSilent in the
 -- vehicle script); while a range extender runs, the vanilla generator loop

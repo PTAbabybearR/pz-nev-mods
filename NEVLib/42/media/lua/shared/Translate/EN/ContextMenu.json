@@ -4,5 +4,9 @@
     "ContextMenu_NEV_SlowCharge": "Start charging (home charger)",
     "ContextMenu_NEV_CarFromStation": "Charge from the power station (%1 kWh)",
     "ContextMenu_NEV_PowerStationToCar": "Charge the nearby EV from it (%1 kWh)",
-    "ContextMenu_NEV_PowerStationCharge": "Charge the power station (now %1 / %2 kWh)"
+    "ContextMenu_NEV_PowerStationCharge": "Charge the power station (now %1 / %2 kWh)",
+    "ContextMenu_NEV_V2LUnlock": "Unlock vehicle-to-load",
+    "ContextMenu_NEV_V2LStart": "Start vehicle-to-load",
+    "ContextMenu_NEV_V2LStop": "Stop vehicle-to-load (%1%% left, about %2 h)",
+    "ContextMenu_NEV_V2LStopShort": "Stop vehicle-to-load (%1%% left)"
 }

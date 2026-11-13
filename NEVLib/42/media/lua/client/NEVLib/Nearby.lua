@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: the NEVs around the local player, found by one scan that the client modules share (#253-7).
 -- 1.3.1 had three of its own: ArmorModels (31 x 31 every 60 frames - more often the higher the frame rate),
 -- RexSound (31 x 31 every 500 ms) and ChargeUI (21 x 21 every 2 s). Now one scan every SCAN_MS of real time, and

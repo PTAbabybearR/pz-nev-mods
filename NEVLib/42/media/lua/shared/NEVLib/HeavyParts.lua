@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: a heavy part uninstalled from an NEV (the range extender, tagged
 -- base:heavyitem like the vanilla generator) is carried in both hands, as
 -- vanilla does when a generator is picked up. Vanilla's uninstall action puts

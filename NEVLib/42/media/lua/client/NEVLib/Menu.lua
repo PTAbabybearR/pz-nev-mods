@@ -1,9 +1,15 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: menus (DESIGN 3.3, 6.1, 11).
 --  * in-vehicle radial menu (V): energy-mode submenu (EV / hybrid / fuel
 --    priority, each greyed with the reason when the charge does not allow
 --    it, UI-DESIGN 18 W4), fridge and camping slices, settings (exit: all
 --    off). Power is instant on getting in / out (DESIGN 3.3), no slice.
---  * right-click outside a vehicle: start / stop charging
+--  * right-click outside a vehicle: start / stop charging; vehicle-to-load
+--    (#180, v2l-design 3.0 / 3.8: unlock once, start / stop)
 --  * right-click a gas pump or a placed home charger: charge the NEV next to it
 --  * portable power station (DESIGN 6.4): right-click the station itself (in
 --    the inventory, or placed on the ground) -> charge it / give its energy to
@@ -23,11 +29,14 @@ require "NEVLib/EnergyMode"
 require "NEVLib/ChargeAction"
 require "NEVLib/PowerStation"
 require "NEVLib/PowerStationActions"
+require "NEVLib/V2L"
+require "ISUI/ISModalDialog"
 
 local Util, Registry, State, Battery, Charging, Camping, Fridge, Net =
     NEVLib.Util, NEVLib.Registry, NEVLib.State, NEVLib.Battery, NEVLib.Charging, NEVLib.Camping, NEVLib.Fridge, NEVLib.Net
 local EnergyMode = NEVLib.EnergyMode
 local PowerStation = NEVLib.PowerStation
+local V2L = NEVLib.V2L
 local Menu = {}
 NEVLib.Menu = Menu
 
@@ -46,6 +55,11 @@ local REASON = {
     needSoc20 = "IGUI_NEV_Reason_NeedSoc20", needSoc3 = "IGUI_NEV_Reason_NeedSoc3",
     stationEmpty = "IGUI_NEV_Reason_StationEmpty", noVehicle = "IGUI_NEV_Reason_NoVehicleNear",
     needPlaced = "IGUI_NEV_Reason_NeedPlaced", stationNoPower = "IGUI_NEV_Reason_StationNoPower",
+    v2lSkill = "IGUI_NEV_Reason_V2LSkill", v2lNoItem = "IGUI_NEV_Reason_V2LNoItem",
+    v2lLocked = "IGUI_NEV_Reason_V2LLocked", v2lUnlocked = "IGUI_NEV_Reason_V2LUnlocked",
+    stationV2L = "IGUI_NEV_Reason_StationV2L",   -- #396 option A
+    v2lCharging = "IGUI_NEV_Reason_V2LCharging", v2lOn = "IGUI_NEV_Reason_V2LOn", v2lOff = "IGUI_NEV_Reason_V2LOff",
+    v2lNoSquare = "IGUI_NEV_Reason_V2LNoSquare", v2lPower = "IGUI_NEV_Reason_V2LPower", powerUnseen = "IGUI_NEV_Reason_PowerUnseen",
 }
 Menu.REASON = REASON
 
@@ -56,6 +70,9 @@ function Menu.reasonText(vehicle, reason)
         local side = cfg and cfg.chargePortSide
         if side then return T("IGUI_NEV_Reason_PortFar", T("IGUI_NEV_Side_" .. side)) end
         return T("IGUI_NEV_Reason_PortFarNoSide")
+    end
+    if reason == "v2lLowCharge" then
+        return T("IGUI_NEV_Reason_V2LLowCharge", tostring(math.floor(V2L.cutoff() * 100 + 0.5)))
     end
     return REASON[reason] and T(REASON[reason]) or nil
 end
@@ -212,6 +229,15 @@ function Menu.fillSettingsMenu(menu, player, vehicle)
     menu:clear()
     menu:addSlice(T(st.exitAllOff and "IGUI_NEV_SettingExitAllOffOn" or "IGUI_NEV_SettingExitAllOffOff"),
         icon("media/ui/NEVLib/fridge.png"), Menu.runAndReopen, player, "toggleExitAllOff", vehicle)
+    -- #389: vanilla's headlight icons, on / off as the setting is
+    menu:addSlice(T(st.keepLights and "IGUI_NEV_SettingKeepLightsOn" or "IGUI_NEV_SettingKeepLightsOff"),
+        icon(st.keepLights and "media/ui/vehicles/vehicle_lightsON.png" or "media/ui/vehicles/vehicle_lightsOFF.png"),
+        Menu.runAndReopen, player, "toggleKeepLights", vehicle)
+    -- #236: the simulated engine sound; nil (a save from before it) is on
+    local soundOn = st.engineSoundOff ~= true
+    menu:addSlice(T(soundOn and "IGUI_NEV_SettingEngineSoundOn" or "IGUI_NEV_SettingEngineSoundOff"),
+        icon(soundOn and "media/ui/vehicles/vehicle_speakersON.png" or "media/ui/vehicles/vehicle_speakersOFF.png"),
+        Menu.runAndReopen, player, "toggleEngineSound", vehicle)
     menu:addSlice(T("IGUI_NEV_Back"), icon("media/ui/NEVLib/arrow_left.png"), Menu.backToMain, player)
 end
 
@@ -455,6 +481,77 @@ local function onInventoryMenu(playerNum, context, items)
 end
 Events.OnFillInventoryObjectContextMenu.Add(Util.guard("inventoryMenu", onInventoryMenu))
 
+---------------------------------------------------------------------------
+-- Vehicle-to-load (#180, v2l-design 3.0 / 3.8) on the car's outside menu: "unlock" until it is unlocked, shown only
+-- with a generator in the car (a yes / no dialog: that generator is used up), then "start" or "stop (x % left, about y hours)". Greyed with the
+-- reason; the last automatic stop is named under "start". The server checks everything again (Net).
+---------------------------------------------------------------------------
+
+local function tipOption(option, text)
+    local tip = ISToolTip:new()
+    tip:initialise()
+    tip.description = text
+    option.toolTip = tip
+end
+
+function Menu.onV2LUnlockConfirm(target, button, player, vehicle)
+    if button and button.internal == "YES" then Menu.run(player, "v2lUnlock", vehicle) end
+end
+
+function Menu.askV2LUnlock(player, vehicle)
+    local item = V2L.findGenerator(vehicle)
+    local name = item and item:getDisplayName() or "?"
+    -- #396: two more lines (fuel by the energy; no power station). Vanilla's CalcSize grows the box to the
+    -- lines (one per newline) and the widest of them, so this is a floor.
+    local w, h = 380, 170
+    local sw, sh = getCore():getScreenWidth(), getCore():getScreenHeight()
+    local dlg = ISModalDialog:new(sw / 2 - w / 2, sh / 2 - h / 2, w, h, T("IGUI_NEV_V2LUnlockConfirm", name), true, nil,
+        Menu.onV2LUnlockConfirm, player:getPlayerNum(), player, vehicle)
+    dlg:initialise()
+    -- centre the size it really has (11-09 E-6: grown to 811 wide, placed for 380 it ran off a 1216 window)
+    dlg:setX(math.max(0, sw / 2 - dlg:getWidth() / 2))
+    dlg:setY(math.max(0, sh / 2 - dlg:getHeight() / 2))
+    dlg:addToUIManager()
+end
+
+function Menu.addV2LOptions(context, player, vehicle)
+    local st = State.get(vehicle)
+    local d = st.v2l
+    if not (d and d.unlocked) then
+        -- nothing to unlock with: no menu at all (3.8)
+        local item = V2L.findGenerator(vehicle)
+        if not item then return end
+        local option = context:addOption(T("ContextMenu_NEV_V2LUnlock"), player, Menu.askV2LUnlock, vehicle)
+        local why = V2L.cannotUnlock(vehicle, player)
+        if why then
+            greyOut(option, vehicle, why)
+        else
+            tipOption(option, T("IGUI_NEV_V2LUnlockTip", item:getDisplayName()))
+        end
+        return
+    end
+    local soc = Battery.getSoc(vehicle)
+    local pct = tostring(math.floor(soc * 100 + 0.5))
+    if d.on then
+        local hours = V2L.hoursLeft(soc, Battery.capacityKWh(vehicle), V2L.cutoff(), d.kw)
+        local label = hours and T("ContextMenu_NEV_V2LStop", pct, string.format("%.1f", hours))
+            or T("ContextMenu_NEV_V2LStopShort", pct)
+        context:addOption(label, player, Menu.run, "v2lStop", vehicle)
+        return
+    end
+    local option = context:addOption(T("ContextMenu_NEV_V2LStart"), player, Menu.run, "v2lStart", vehicle)
+    local why = V2L.cannotStart(vehicle)
+    if why then
+        greyOut(option, vehicle, why)
+    else
+        local text = T("IGUI_NEV_V2LStartTip", tostring(math.floor(V2L.cutoff() * 100 + 0.5)))
+        if d.stop and d.stop ~= "manual" then
+            text = text .. " <LINE> " .. T("IGUI_NEV_V2LLastStop", T("IGUI_NEV_V2LStop_" .. d.stop))
+        end
+        tipOption(option, text)
+    end
+end
+
 local origOutside = ISVehicleMenu.FillMenuOutsideVehicle
 -- Vanilla hands this the player NUMBER and looks the player up itself (ISVehicleMenu.lua:594-595);
 -- our options need the player object (I-241, player report on v1.0.0: passing the number on made
@@ -465,6 +562,7 @@ local outsideGuarded = Util.guard("outsideMenu", function(playerNum, context, ve
     if not player then return end
     Menu.addChargeOptions(context, player, vehicle, Menu.sourcesNear(vehicle))
     Menu.addCarStationOption(context, player, vehicle)
+    Menu.addV2LOptions(context, player, vehicle)
 end)
 function ISVehicleMenu.FillMenuOutsideVehicle(player, context, vehicle, test)
     local r = origOutside(player, context, vehicle, test)
@@ -506,6 +604,16 @@ local function onWorldMenu(playerNum, context, worldObjects, test)
             squares[#squares + 1] = sq
         end
     end
+    -- the car's invisible generator (v2l-design 3.8): vanilla's generator submenu goes, unless a vanilla generator
+    -- stands in the clicked squares as well (vanilla shows one generator; the server refuses ours anyway)
+    local ours, theirs = false, false
+    for _, sq in ipairs(squares) do
+        local g = sq:getGenerator()
+        if g then
+            if V2L.isOurs(g) then ours = true else theirs = true end
+        end
+    end
+    if ours and not theirs then context:removeOptionByName(T("ContextMenu_Generator")) end
     local station = PowerStation.worldAt(squares)
     if station then Menu.addStationWorldOptions(context, player, station) end
     local source = Charging.sourceAt(squares)

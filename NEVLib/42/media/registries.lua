@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib item tags: B42 keeps item tags in a registry (zombie.scripting.objects.ItemTag); a mod registers its own
 -- here, read before the scripts. Checked in the server self test (armor-tag).
 -- nev:metalarmor: every armour add-on, so one library repair recipe covers all cars (PARTS-DESIGN 6.5, U5 5, #174).

@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: charging indicator above charging vehicles near the player
 -- (UI-DESIGN 2.4): the dashboard's battery bar in small - plug icon, bar
 -- with the flowing charge animation, percent and minutes left. Drawn above

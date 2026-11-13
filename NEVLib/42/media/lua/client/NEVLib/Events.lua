@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: client event wiring - seat changes drive power on / off (DESIGN
 -- 3.3), the air filter runs per player update (7.3), and loaded NEVs that
 -- have something running (fridge, charging, camping, range extender) are kept

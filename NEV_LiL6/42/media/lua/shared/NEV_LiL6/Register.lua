@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- Li Auto L6 (EREV): model configuration for NEV Lib (DESIGN 5, 13.3).
 -- Energy numbers are the reference draws; NEVLib.Registry.ENERGY_SCALE scales the
 -- time-based ones at load (v1 balance, docs/design/energy/energy-balance-design.md; tools/balance_model.py).
@@ -61,8 +66,14 @@ NEVLib.Registry.register("Base.NEV_LiL6", {
         { part = "NEVArmorWindshieldRear", protects = { "WindshieldRear" }, window = "WindshieldRear" },
         { part = "NEVBullbarFront", protects = { "EngineDoor", "Engine", "HeadlightLeft", "HeadlightRight" } },
         { part = "NEVBullbarRear", protects = { "TrunkDoor", "HeadlightRearLeft", "HeadlightRearRight", "GasTank" } },
+        -- tire guards (revision 21, #287): the tire's condition is put back, the guard pays (pickup-armor-design.md 5.3)
+        { part = "NEVTireGuardFrontLeft", protects = { "TireFrontLeft" } },
+        { part = "NEVTireGuardFrontRight", protects = { "TireFrontRight" } },
+        { part = "NEVTireGuardRearLeft", protects = { "TireRearLeft" } },
+        { part = "NEVTireGuardRearRight", protects = { "TireRearRight" } },
     },
-    -- spawned with the car, normal grade only (Q5, revision 17): roof rack 25 %, each bull bar 5 %, armour never
+    -- spawned with the car, normal grade only (Q5, revision 17): roof rack 25 %, each bull bar 5 %, armour and tire
+    -- guards never
     armorSpawn = { NEVRoofRack = 0.25, NEVBullbarFront = 0.05, NEVBullbarRear = 0.05 },
     -- spawning (#222, user 2026-10-16): the library's base share in every ordinary-car zone (NEVLib/Spawns),
     -- more in the rich / middle-class areas where vanilla keeps its SUV

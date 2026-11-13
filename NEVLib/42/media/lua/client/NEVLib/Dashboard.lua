@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: NEV dashboard layout and drawing (docs/design/ui/dashboard-design.md 2, 16-23, 25). Draws on our own
 -- panel NEVLib/DashPanel; NEVLib/DashRoute decides when the player sees it (#339: the driver of an NEV only, other
 -- vehicles keep vanilla's or another mod's dashboard untouched).

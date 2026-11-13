@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: shared helpers (logging, error guard, small math, Kahlua-safe sort).
 -- Lives in shared/: PZ loads shared -> client -> server (DESIGN 13.5-1).
 

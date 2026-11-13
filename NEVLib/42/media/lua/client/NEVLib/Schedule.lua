@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: one OnTick for the client's "every N ms of real time" work (#327). The client fires OnTick about 244
 -- times a second; each module with its own OnTick paid a call and a clock read every tick even when it had nothing
 -- to do. Now one tick compares the clock with the earliest due time and returns; a due task runs under its own

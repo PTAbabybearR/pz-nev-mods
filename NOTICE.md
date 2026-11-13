@@ -41,6 +41,9 @@ they are not licensed under the Mozilla Public License or LICENSE-ART.txt:
     copies the device properties of the game's TvBlack.
   - The fridge factors (NEVLib: Fridge.lua, FRIDGE_FACTOR and ROT_SPEED) are
     the values of the game's Food.getFridgeFactor / Food.getFoodRotSpeed.
+  - The range extender repair action (NEVLib: RexRepairAction.lua,
+    NEVRepairRangeExtenderAction:complete()) is the body of the game's
+    ISRepairEngine:complete() (ISRepairEngine.lua) for our part.
 No other game asset (model, texture, sound, decompiled code) is included.
 Where the mods show game images or models (for example vanilla icons), they
 load them from the game.
@@ -80,6 +83,9 @@ are not affiliated with or endorsed by any vehicle manufacturer.
     TvBlack 的设备属性。
   - 冰箱系数（NEVLib 的 Fridge.lua 里的 FRIDGE_FACTOR、ROT_SPEED）是游戏原版
     Food.getFridgeFactor / Food.getFoodRotSpeed 里的数值。
+  - 增程器修理动作（NEVLib 的 RexRepairAction.lua 里的
+    NEVRepairRangeExtenderAction:complete()）是游戏原版 ISRepairEngine:complete()
+    （ISRepairEngine.lua）的正文，换成了我们的部件。
 除此之外不包含游戏的任何其他资源（模型、贴图、声音、反编译代码）。mod 里显示的
 游戏图片或模型（例如原版图标）是从游戏本身加载的。
 

@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: seat icons in the vanilla seat-switch window (ISVehicleSeatUI).
 -- Vanilla draws each seat's 41 px icon at the seat's "inside" position
 -- (passenger offset x / z times the window scale). Three rear seats 0.32

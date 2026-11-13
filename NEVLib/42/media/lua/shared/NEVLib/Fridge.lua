@@ -1,3 +1,10 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-- Parts of this file reuse Project Zomboid content, (c) The Indie Stone; those
+-- parts are not covered by this licence. See NOTICE.txt.
+
 -- NEV Lib: vehicle fridge (DESIGN 7.1). Stand-alone module: it only uses
 -- NEVLib.PowerSupply for electricity, never the battery / powertrain code, so it
 -- can become a generic mod later by swapping the provider.

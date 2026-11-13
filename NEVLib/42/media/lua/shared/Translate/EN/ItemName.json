@@ -43,5 +43,6 @@
     "NEVLib.Pickup_TireGuard_Fine": "Fine Pickup Tire Guard",
     "NEVLib.Manual_Pickup": "NEV Pickup Modification Manual",
     "NEVLib.SUV_TireGuard": "SUV Tire Guard",
-    "NEVLib.SUV_TireGuard_Fine": "Fine SUV Tire Guard"
+    "NEVLib.SUV_TireGuard_Fine": "Fine SUV Tire Guard",
+    "NEVLib.V2LGenerator": "Vehicle-to-load"
 }

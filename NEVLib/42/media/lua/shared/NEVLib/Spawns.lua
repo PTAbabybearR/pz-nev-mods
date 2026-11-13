@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: where NEVs spawn (DESIGN 10.1, #222, user 2026-10-16).
 -- Every registered NEV spawns wherever vanilla spawns ordinary cars (ZONES), as a SHARE of the cars each zone
 -- table spawns: the weight is worked out from the table's final total, so other vehicle mods (KI5 adds 1-5 per

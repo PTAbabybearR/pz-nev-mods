@@ -1,3 +1,9 @@
+/* Copyright (c) 2026 熊叔
+   This Source Code Form is subject to the terms of the Mozilla Public
+   License, v. 2.0. If a copy of the MPL was not distributed with this
+   file, You can obtain one at https://mozilla.org/MPL/2.0/.
+   Parts of this file reuse Project Zomboid content, (c) The Indie Stone; those
+   parts are not covered by this licence. See NOTICE.txt. */
 module NEVLib
 {
     imports
@@ -303,5 +309,28 @@ module NEVLib
         Icon = GloveBox,
         ConditionMax = 100,
         MechanicsItem = true,
+    }
+
+    /* Vehicle-to-load (#180, docs/design/energy/v2l-design.md 3.2): the item
+       behind the invisible vanilla generator an NEV places on its square while
+       it powers the area. Never a player's item: no loot, no recipe, the world
+       menu of its tile is removed (client/NEVLib/Menu.lua) and the server
+       refuses the vanilla generator actions on it (NEVLib/V2L.lua). Vanilla
+       finds it from the tile through the base:generator tag + WorldObjectSprite
+       (IsoGenerator.getGeneratorItemType:147): sound radius / volume 1 (the
+       generator's zombie sound, :167-180; 1 / 2 = 0 indoors), condition loss
+       one in 1000000 game hours (:187-193; the battery wears instead, 3.4). */
+    item V2LGenerator
+    {
+        DisplayCategory = Electronics,
+        ItemType = base:normal,
+        Weight = 40.0,
+        Icon = Generator,
+        ConditionMax = 100,
+        Tags = base:heavyitem;base:generator,
+        WorldObjectSprite = nev_v2l_01_0,
+        ConditionLowerChanceOneIn = 1000000,
+        SoundRadius = 1,
+        SoundVolume = 1,
     }
 }

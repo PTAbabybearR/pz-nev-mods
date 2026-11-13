@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: vehicle model registry (DESIGN 13.3). Model packs register their
 -- configuration in shared/; every module asks the registry whether a vehicle
 -- is one of ours and which features it has, never the vehicle name.
@@ -27,6 +32,11 @@ Registry.VANILLA_TV_LOAD = 0.03         -- IsoGenerator.TelevisionPowerConsumpti
 -- charger. Fast charging adds nothing: vanilla bills the pump itself (0.03).
 Registry.CHARGER_LOAD = 0.15
 Registry.STATION_CHARGER_LOAD = 0.05    -- IsoGenerator.BatteryChargerPowerConsumption
+-- Vehicle-to-load (#180, v2l-design.md 3.5): kWh of the car's battery per litre the invisible vanilla generator burns.
+-- The user's value (11-04, "K先定为10.625"), written as a literal on purpose: the biggest battery (BEV high 125 kWh)
+-- down to the lowest cutoff (15 %) = one full vanilla tank (10 L). tools/balance_model.py --check fails when a bigger
+-- battery joins BATTERY_KINDS, so the user sets K again instead of it changing by itself.
+Registry.V2L_KWH_PER_L = 10.625
 
 -- Defaults for anything a model pack does not specify. Energy figures are the
 -- M1 placeholders (docs/archive/m1/M1-PLAN.md section 3); balance happens in M3.

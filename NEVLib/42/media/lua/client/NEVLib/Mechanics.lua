@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: part names in the mechanics window (DESIGN 9). The vanilla
 -- "Engine" part is our drive motor and "Battery" is the traction battery.
 -- Their translation keys are shared by every vehicle, so the names are
@@ -5,6 +10,7 @@
 require "NEVLib/Util"
 require "NEVLib/Registry"
 require "NEVLib/Armor"
+require "NEVLib/RexRepairAction"
 require "Vehicles/ISUI/ISVehicleMechanics"
 
 local Util, Registry, Armor = NEVLib.Util, NEVLib.Registry, NEVLib.Armor
@@ -80,12 +86,12 @@ end
 
 -- Range extender repair (LEGACY-ISSUES 2 option A, user 2026-10-08 D2):
 -- vanilla only offers "Repair Engine" for the part named "Engine"
--- (ISVehicleMechanics.lua:324-340), but ISRepairEngine works on whatever
--- part it is given (ISRepairEngine.lua:37-89, server-side complete()). So the
--- same option, with the same conditions, is added for our range extender and
--- calls the vanilla action: engine parts, wrench, Mechanics >= the car's
--- engineRepairLevel, condition < 100.
-Mechanics.REX_PART = "NEVRangeExtender"
+-- (ISVehicleMechanics.lua:324-340). The same option, with the same conditions,
+-- is added for our range extender: engine parts, wrench, Mechanics >= the
+-- car's engineRepairLevel, condition < 100. Clicking it does what vanilla's
+-- onRepairEngine does, with the library's own action (RexRepairAction.lua):
+-- since 42.22 vanilla ISRepairEngine repairs the part named "Engine" only.
+Mechanics.REX_PART = NEVRepairRangeExtenderAction.PART
 
 function Mechanics.rexRepairState(chr, part, wrench)
     if not part or part:getId() ~= Mechanics.REX_PART or not part:getInventoryItem() then return nil end
@@ -97,6 +103,37 @@ function Mechanics.rexRepairState(chr, part, wrench)
         and chr:getPerkLevel(Perks.Mechanics) >= part:getVehicle():getScript():getEngineRepairLevel()
         and wrench ~= nil
     return ok
+end
+
+-- vanilla ISVehicleMechanics.onRepairEngine (42.21 and 42.22 alike: get out, wrench and engine parts to the main
+-- inventory, walk to the part, open the hood around the action), queuing the library's action instead
+function Mechanics.onRepairRangeExtender(playerObj, part)
+    if playerObj:getVehicle() then
+        ISVehicleMenu.onExit(playerObj)
+    end
+    local _, tagToItem = VehicleUtils.getItems(playerObj:getPlayerNum())
+    local item = tagToItem[ItemTag.WRENCH][1]
+    ISVehiclePartMenu.toPlayerInventory(playerObj, item)
+    local parts = playerObj:getInventory():getFirstTypeRecurse("EngineParts")
+    ISVehiclePartMenu.toPlayerInventory(playerObj, parts)
+    local vehicle = part:getVehicle()
+    ISTimedActionQueue.add(ISPathFindAction:pathToVehicleArea(playerObj, vehicle, part:getArea()))
+    local engineCover = nil
+    local doorPart = vehicle:getPartById("EngineDoor")
+    if doorPart and doorPart:getDoor() and doorPart:getInventoryItem() and not doorPart:getDoor():isOpen() then
+        engineCover = doorPart
+    end
+    local time = 300
+    if engineCover then
+        if engineCover:getDoor():isLocked() and VehicleUtils.RequiredKeyNotFound(engineCover, playerObj) then
+            ISTimedActionQueue.add(ISUnlockVehicleDoor:new(playerObj, engineCover))
+        end
+        ISTimedActionQueue.add(ISOpenVehicleDoor:new(playerObj, vehicle, engineCover))
+        ISTimedActionQueue.add(NEVRepairRangeExtenderAction:new(playerObj, part, item, time))
+        ISTimedActionQueue.add(ISCloseVehicleDoor:new(playerObj, vehicle, engineCover))
+    else
+        ISTimedActionQueue.add(NEVRepairRangeExtenderAction:new(playerObj, part, item, time))
+    end
 end
 
 local origMenu = ISVehicleMechanics.doPartContextMenu
@@ -111,7 +148,7 @@ local addRexRepair = Util.guard("rexRepairMenu", function(self, part)
     local ok = Mechanics.rexRepairState(self.chr, part, ISVehicleMechanics:getWrench(self.chr))
     if ok == nil or not self.context then return end
     local option = self.context:addOption(Util.text("IGUI_NEV_RepairRangeExtender"), playerObj,
-        ISVehicleMechanics.onRepairEngine, part)
+        Mechanics.onRepairRangeExtender, part)
     self:doMenuTooltip(part, option, "repairengine")
     if not ok then option.notAvailable = true end
 end)

@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: powertrain logic without game objects (DESIGN 3.2, 3.4-3.6).
 -- Units: SOC is a 0..1 fraction, power in kW, energy in kWh, time in game
 -- minutes, speed in km/h (the value the game reports).
@@ -137,7 +142,10 @@ end
 --   range extender starts only below 3 % (UI-DESIGN 18 W4, user 2026-10-07;
 --   which modes may be picked at which charge: NEVLib/EnergyMode).
 --   holdSoc: fuel priority target captured when the mode was selected
-function Powertrain.rexDecide(mode, soc, speed, wasOn, holdSoc)
+--   floor: optional, while the car powers its area (V2L, v2l-design 3.1): outside "ev" the charge thresholds below
+--     it are raised to it (hybrid's 20 % hold, the fuel priority target), the band kept; hybrid's 80 % speed rule
+--     stays as it is
+function Powertrain.rexDecide(mode, soc, speed, wasOn, holdSoc, floor)
     local function below(threshold, band)
         if wasOn then return soc < threshold + band end
         return soc < threshold
@@ -145,10 +153,13 @@ function Powertrain.rexDecide(mode, soc, speed, wasOn, holdSoc)
     local hold = Powertrain.HOLD_BAND
     if mode == "fuel" then
         local target = Util.clamp(holdSoc or 0.8, 0.2, 0.8)
+        if floor and floor > target then target = floor end
         return below(target, hold)
     end
     if mode == "hybrid" then
-        if below(0.20, hold) then return true end -- after draining to 20 % it holds there
+        local low = 0.20
+        if floor and floor > low then low = floor end
+        if below(low, hold) then return true end -- after draining to 20 % it holds there
         local minSpeed = Powertrain.HYBRID_MIN_SPEED - (wasOn and 5 or 0)
         return math.abs(speed or 0) >= minSpeed and below(0.80, Powertrain.HYSTERESIS)
     end
@@ -187,7 +198,8 @@ end
 --   chargeKW,       -- from a charger (0 when not charging)
 --   chargeKWhMax,   -- nil = unlimited; else the most the charger can deliver
 --                   -- (a generator's fuel left, DESIGN 6.3)
---   rex = nil | { mode, holdSoc, speed, wasOn, fuelL, kw, fuelKWhPerL, healthy, allowed }
+--   rex = nil | { mode, holdSoc, speed, wasOn, fuelL, kw, fuelKWhPerL, healthy, allowed, floor }
+--                 (floor: Powertrain.rexDecide, while powering the area)
 -- }
 -- returns { soc, rexOn, fuelUsedL, rexMinutes, campingExit, depleted, full,
 --           chargedKWh,   -- what the charger put in (nothing past full)
@@ -211,7 +223,7 @@ function Powertrain.simulate(p)
     for _ = 1, steps do
         local gen = 0
         if rex and rex.allowed and rex.healthy and fuel > 0 then
-            rexOn = Powertrain.rexDecide(rex.mode, soc, rex.speed, rexOn, rex.holdSoc)
+            rexOn = Powertrain.rexDecide(rex.mode, soc, rex.speed, rexOn, rex.holdSoc, rex.floor)
         else
             rexOn = false
         end

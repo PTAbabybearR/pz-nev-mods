@@ -21,11 +21,15 @@
     "Sandbox_NEV_InfotainmentTV": "中控屏能看电视",
     "Sandbox_NEV_InfotainmentTV_tooltip": "关掉后，新能源车的中控屏只能当收音机，不能看电视、放录像带。已经在地图上的车下次载入时生效，里面的录像带会放进手套箱。",
     "Sandbox_NEV_GeneratorFuelFactor": "发电机充电耗油倍率",
-    "Sandbox_NEV_GeneratorFuelFactor_tooltip": "由发电机供电时，充电设备像原版电器一样按负载耗油的倍率。默认 1：家用充电桩充电时的耗油和一台普通家电差不多，便携储能电源和原版电瓶充电器一样；耗油只看充了多久，和充进多少电无关。加油站快充只算油泵本身（原版）。还会乘上原版「发电机耗油」。市电充电不耗油。",
+    "Sandbox_NEV_GeneratorFuelFactor_tooltip": "由发电机供电时，充电设备像原版电器一样按负载耗油的倍率。默认 1：家用充电桩充电时的耗油和一台普通家电差不多，便携储能电源和原版电瓶充电器一样；耗油只看充了多久，和充进多少电无关。已解锁外放电的车例外：按充进的电量耗油（每 10.625 kWh 约 1 L，乘这个倍率，不乘原版「发电机耗油」）。加油站快充只算油泵本身（原版）。还会乘上原版「发电机耗油」。市电充电不耗油。",
     "Sandbox_NEV_AllowFastCharge": "允许在加油站快充",
     "Sandbox_NEV_AllowFastCharge_tooltip": "有电的油泵可以给新能源车充电。",
+    "Sandbox_NEV_ZombieWakeRadius": "车内睡觉被僵尸叫醒的半径（格）",
+    "Sandbox_NEV_ZombieWakeRadius_tooltip": "在新能源车里睡觉时，这个距离内有僵尸就会被叫醒，和原版被吵醒一样。\n0 ＝ 不叫醒。",
     "Sandbox_NEV_FridgeOffCarHours": "冰箱离车工作时长（小时）",
     "Sandbox_NEV_FridgeOffCarHours_tooltip": "车关闭后车载冰箱继续工作的游戏小时数，到时间暂停，再次启动车辆后恢复。露营模式中不计时。\n0 ＝ 不限时。",
     "Sandbox_NEV_ParkedRecharge": "停车自动补电",
-    "Sandbox_NEV_ParkedRecharge_tooltip": "增程车停着、电量低于 3 %% 且有油时，增程器自动启动，补到约 28 %% 停。\n人不在附近也会发出增程器的声音，可能引来僵尸。"
+    "Sandbox_NEV_ParkedRecharge_tooltip": "增程车停着、电量低于 3 %% 且有油时，增程器自动启动，补到约 28 %% 停。\n人不在附近也会发出增程器的声音，可能引来僵尸。",
+    "Sandbox_NEV_V2LCutoff": "外放供电截止电量（%%）",
+    "Sandbox_NEV_V2LCutoff_tooltip": "车辆外放电时，电量降到这个值就自动停止外放，留电开回去。"
 }

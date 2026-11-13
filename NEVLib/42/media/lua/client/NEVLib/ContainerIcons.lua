@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: the in-car fridge's button in the loot window shows a chest freezer (#197). ISInventoryPage:addContainerButton
 -- picks the button picture by container type from ContainerButtonIcons (shared/Definitions/ContainerButtonIcons.lua)
 -- and falls back to the plain container; a vehicle part's container type is its part id, NEVFridge for every NEV.

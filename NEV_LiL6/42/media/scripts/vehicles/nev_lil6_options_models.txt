@@ -1,3 +1,7 @@
+/* Copyright (c) 2026 熊叔
+   This Source Code Form is subject to the terms of the Mozilla Public
+   License, v. 2.0. If a copy of the MPL was not distributed with this
+   file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 module Base
 {
     /* NEV_LiL6 armour / add-on part models (v1.3, art segment 5: docs/vehicles/lil6/art/options-record-s5.md; rebuild with
@@ -115,6 +119,23 @@ module Base
     {
         mesh = vehicles/NEV_LiL6_Options|LiL6_opt_roofrack,
         texture = Vehicles/nev_lil6_options,
+        shader = vehiclewheel,
+        scale = 0.000494505495,
+    }
+    /* Tire guards (#287; version c, SUV 745 mm, depth x 0.30, user 11-03): their own file and the library's ground
+       texture (UVs of NEV_SUV_TireGuard), origin at the wheel centre (wheel = ... parts);
+       art/vehicles/lil6/options/export_tire_guard_fbx.py. The rear wheels share the pair. */
+    model NEV_LiL6_OptTireGuardL
+    {
+        mesh = vehicles/NEV_LiL6_TireGuard|LiL6_opt_tire_guard_L,
+        texture = WorldItems/NEV_TireGuard_Ground,
+        shader = vehiclewheel,
+        scale = 0.000494505495,
+    }
+    model NEV_LiL6_OptTireGuardR
+    {
+        mesh = vehicles/NEV_LiL6_TireGuard|LiL6_opt_tire_guard_R,
+        texture = WorldItems/NEV_TireGuard_Ground,
         shader = vehiclewheel,
         scale = 0.000494505495,
     }

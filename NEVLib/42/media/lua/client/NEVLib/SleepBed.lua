@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: sleeping in an NEV with camping mode on counts as an ordinary bed
 -- (NEVLib.Camping.bedType; M1 issue 16). Wraps the vanilla bed-quality lookup,
 -- which the sleep action calls as ISWorldObjectContextMenu.getBedQuality.

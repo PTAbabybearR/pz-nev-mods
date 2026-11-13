@@ -43,5 +43,6 @@
     "NEVLib.Pickup_TireGuard_Fine": "优秀的皮卡轮胎护板",
     "NEVLib.Manual_Pickup": "新能源皮卡改装手册",
     "NEVLib.SUV_TireGuard": "SUV 轮胎护板",
-    "NEVLib.SUV_TireGuard_Fine": "优秀的 SUV 轮胎护板"
+    "NEVLib.SUV_TireGuard_Fine": "优秀的 SUV 轮胎护板",
+    "NEVLib.V2LGenerator": "车辆外放电"
 }

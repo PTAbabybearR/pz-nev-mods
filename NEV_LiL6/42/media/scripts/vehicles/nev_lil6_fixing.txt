@@ -1,3 +1,9 @@
+/* Copyright (c) 2026 熊叔
+   This Source Code Form is subject to the terms of the Mozilla Public
+   License, v. 2.0. If a copy of the MPL was not distributed with this
+   file, You can obtain one at https://mozilla.org/MPL/2.0/.
+   Parts of this file reuse Project Zomboid content, (c) The Indie Stone; those
+   parts are not covered by this licence. See NOTICE.txt. */
 module Base
 {
     /* #335: the L6 trunk (TruckBed) fits its own item NEV_LiL6.LiL6Trunk (capacity 100, nev_lil6_items.txt), which

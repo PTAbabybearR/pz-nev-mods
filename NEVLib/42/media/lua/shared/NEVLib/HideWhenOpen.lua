@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: a part model that disappears while a door is open (GitHub #238, user 2026-10-16: the Cybertruck's
 -- tonneau cover is not drawn while the tailgate is open - no roll-up animation). Generic: a model pack declares
 -- in Register.lua

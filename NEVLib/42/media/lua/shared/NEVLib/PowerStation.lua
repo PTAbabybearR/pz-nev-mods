@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: portable power station (DESIGN 6.4, M1 issue 28 plan A): the
 -- vanilla "hose + petrol can" for electric cars. A drainable item holding a
 -- petrol can's worth of energy; charged on a powered square (generator power costs fuel per kWh,
@@ -113,9 +118,12 @@ end
 ---------------------------------------------------------------------------
 
 -- Vanilla IsoCarBatteryCharger.update:161: haveElectricity() (generator) or
--- grid power in a room.
+-- grid power in a room. #180 (v2l-design.md 3.7): a car's vehicle-to-load does not count - the generator branch
+-- needs a generator Charging.findGenerator finds, and it skips the vehicle-to-load ones.
 function PowerStation.squarePowered(sq)
-    return sq ~= nil and (sq:haveElectricity() or (sq:hasGridPower() and sq:getRoom() ~= nil))
+    if sq == nil then return false end
+    if sq:hasGridPower() and sq:getRoom() ~= nil then return true end
+    return sq:haveElectricity() and Charging.findGenerator(sq) ~= nil
 end
 
 -- The generator paying for it, or nil (grid power in a room: free). Outdoors
@@ -130,7 +138,7 @@ end
 function PowerStation.cannotCharge(item, sq)
     if not PowerStation.isStation(item) then return "notSupported" end
     if PowerStation.kwh(item) >= PowerStation.CAPACITY_KWH - PowerStation.FULL_EPS then return "full" end
-    if not PowerStation.squarePowered(sq) then return "stationNoPower" end
+    if not PowerStation.squarePowered(sq) then return Charging.unpaidPowerReason(sq) or "stationNoPower" end
     local gen = PowerStation.generatorFor(sq)
     if gen then
         local left = Charging.hoursLeft(gen, Registry.STATION_CHARGER_LOAD)
@@ -172,6 +180,11 @@ end
 -- Why it cannot charge `vehicle` (nil = it can).
 function PowerStation.cannotGive(item, vehicle)
     if not PowerStation.isStation(item) or not Registry.isNEV(vehicle) then return "notSupported" end
+    -- #396 (v2l-design 3.14 option A, user 11-09): not into a car with vehicle-to-load unlocked - the station
+    -- charges on a generator for almost no fuel, so it would bypass the car's pay-by-energy. First: it does
+    -- not change with the charge levels, so no other reason hides it. It also covers #180's "not into a car
+    -- powering the area" (v2l-design 3.7): only an unlocked car can power it.
+    if Charging.paysPerKWh(vehicle) then return "stationV2L" end
     if PowerStation.kwh(item) <= PowerStation.FULL_EPS then return "stationEmpty" end
     local soc, part = Battery.getSoc(vehicle)
     if not part then return "noBattery" end

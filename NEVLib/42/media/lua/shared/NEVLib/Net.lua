@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: every state-changing player action goes through Net.run (M1-PLAN
 -- 2.14). Single player / host: runs right away. Multiplayer client: sent to
 -- the server, which runs the same action (server-authoritative). Only single
@@ -9,9 +14,10 @@ require "NEVLib/Camping"
 require "NEVLib/Charging"
 require "NEVLib/Fridge"
 require "NEVLib/Battery"
+require "NEVLib/V2L"
 
-local Util, State, Power, Camping, Charging, Fridge, Battery =
-    NEVLib.Util, NEVLib.State, NEVLib.Power, NEVLib.Camping, NEVLib.Charging, NEVLib.Fridge, NEVLib.Battery
+local Util, State, Power, Camping, Charging, Fridge, Battery, V2L =
+    NEVLib.Util, NEVLib.State, NEVLib.Power, NEVLib.Camping, NEVLib.Charging, NEVLib.Fridge, NEVLib.Battery, NEVLib.V2L
 local Net = {}
 NEVLib.Net = Net
 
@@ -29,6 +35,20 @@ Net.actions = {
         local st = State.get(vehicle)
         st.exitAllOff = not st.exitAllOff
         Util.log("SETTING", { exitAllOff = st.exitAllOff })
+        return true
+    end,
+    -- the headlights stay as they were when the last one gets out (#389)
+    toggleKeepLights = function(vehicle)
+        local st = State.get(vehicle)
+        st.keepLights = not st.keepLights
+        Util.log("SETTING", { keepLights = st.keepLights })
+        return true
+    end,
+    -- the simulated engine sound of this car, on / off (#236; user 11-05: kept on the car, for everybody in it)
+    toggleEngineSound = function(vehicle)
+        local st = State.get(vehicle)
+        st.engineSoundOff = st.engineSoundOff ~= true
+        Util.log("SETTING", { engineSoundOff = st.engineSoundOff })
         return true
     end,
     toggleFridge = function(vehicle)
@@ -54,6 +74,16 @@ Net.actions = {
     stopCharge = function(vehicle)
         Charging.stop(vehicle, "manual")
         return true
+    end,
+    -- vehicle-to-load (v2l-design 3.0 / 3.1): the server checks the conditions again
+    v2lUnlock = function(vehicle, args, player)
+        return V2L.unlock(vehicle, player)
+    end,
+    v2lStart = function(vehicle, args, player)
+        return V2L.start(vehicle, player)
+    end,
+    v2lStop = function(vehicle)
+        return V2L.stop(vehicle, "manual")
     end,
 }
 
@@ -100,8 +130,10 @@ end
 -- fridge through the door). Anything not listed is refused.
 Net.NEAR_TILES = 6
 Net.RULES = {
-    powerOn = "inside", setMode = "inside", toggleExitAllOff = "inside", toggleCamping = "inside",
+    powerOn = "inside", setMode = "inside", toggleExitAllOff = "inside", toggleKeepLights = "inside",
+    toggleEngineSound = "inside", toggleCamping = "inside",
     evaluatePower = "inside+exit", toggleFridge = "near", setFridgeMode = "near", startCharge = "near", stopCharge = "near",
+    v2lUnlock = "near", v2lStart = "near", v2lStop = "near",
 }
 Net.CHARGE_KINDS = { fast = true, slow = true }
 

@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: camping mode (DESIGN 7.2). Cabin stays powered after everybody
 -- left; the engine is off so there is no engine noise. Turning it off (by
 -- hand or automatically below 15 %) re-runs the power decision (13.5-8).

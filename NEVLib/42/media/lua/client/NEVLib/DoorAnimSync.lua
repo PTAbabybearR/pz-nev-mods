@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: door pictures follow the door state in multiplayer (GitHub #337; design docs/design/parts/door-anim-sync-design.md).
 -- Vanilla plays a door's Open / Close animation only on the client that runs ISOpenVehicleDoor / ISCloseVehicleDoor
 -- (start(): "TODO: sync part animation"); the state is set on the server (complete()) and a client that receives it

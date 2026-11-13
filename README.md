@@ -12,9 +12,9 @@ Source code of the NEV (new-energy vehicle) mods for Project Zomboid (Build 42).
 
 | mod | 版本 | 创意工坊 |
 |---|---|---|
-| NEV Lib（核心库，其他车型都依赖它） | 1.5.0 | https://steamcommunity.com/sharedfiles/filedetails/?id=3818326067 |
-| 理想 L6（NEV - Li Auto L6） | 1.5.0 | https://steamcommunity.com/sharedfiles/filedetails/?id=3818327486 |
-| 特斯拉 Cybertruck（NEV - Tesla Cybertruck） | 1.1.0 | https://steamcommunity.com/sharedfiles/filedetails/?id=3823960349 |
+| NEV Lib（核心库，其他车型都依赖它） | 1.6.0 | https://steamcommunity.com/sharedfiles/filedetails/?id=3818326067 |
+| 理想 L6（NEV - Li Auto L6） | 1.6.0 | https://steamcommunity.com/sharedfiles/filedetails/?id=3818327486 |
+| 特斯拉 Cybertruck（NEV - Tesla Cybertruck） | 1.1.1 | https://steamcommunity.com/sharedfiles/filedetails/?id=3823960349 |
 
 每发布一版，这里就多一个提交，并打上和 mod 版本同名的 tag（例如 `NEVLib-v1.5.0`）。开发不在这个仓库里做，所以这里没有日常的提交历史。
 
@@ -38,7 +38,7 @@ Source code of the NEV (new-energy vehicle) mods for Project Zomboid (Build 42).
 - 也可以在创意工坊页面留言。
 
 ### 更新日志
-按 mod 分开，见 [CHANGELOG](CHANGELOG) 目录。
+每个 mod 一份，放在各自的文件夹里：[NEVLib/CHANGELOG.md](NEVLib/CHANGELOG.md)、[NEV_LiL6/CHANGELOG.md](NEV_LiL6/CHANGELOG.md)、[NEV_Cybertruck/CHANGELOG.md](NEV_Cybertruck/CHANGELOG.md)。
 
 ## English
 
@@ -47,9 +47,9 @@ Release snapshots of the code of these mods:
 
 | Mod | Version | Steam Workshop |
 |---|---|---|
-| NEV Lib (core library, every car needs it) | 1.5.0 | https://steamcommunity.com/sharedfiles/filedetails/?id=3818326067 |
-| NEV - Li Auto L6 | 1.5.0 | https://steamcommunity.com/sharedfiles/filedetails/?id=3818327486 |
-| NEV - Tesla Cybertruck | 1.1.0 | https://steamcommunity.com/sharedfiles/filedetails/?id=3823960349 |
+| NEV Lib (core library, every car needs it) | 1.6.0 | https://steamcommunity.com/sharedfiles/filedetails/?id=3818326067 |
+| NEV - Li Auto L6 | 1.6.0 | https://steamcommunity.com/sharedfiles/filedetails/?id=3818327486 |
+| NEV - Tesla Cybertruck | 1.1.1 | https://steamcommunity.com/sharedfiles/filedetails/?id=3823960349 |
 
 Every release adds one commit here, tagged with the mod's version (for example `NEVLib-v1.5.0`). Development happens elsewhere, so there is no day-to-day history in this repository.
 
@@ -73,4 +73,4 @@ Every release adds one commit here, tagged with the mod's version (for example `
 - Comments on the Workshop pages work too.
 
 ### Change logs
-One per mod, in the [CHANGELOG](CHANGELOG) folder (in Chinese).
+One per mod, in the mod's own folder (in Chinese): [NEVLib/CHANGELOG.md](NEVLib/CHANGELOG.md), [NEV_LiL6/CHANGELOG.md](NEV_LiL6/CHANGELOG.md), [NEV_Cybertruck/CHANGELOG.md](NEV_Cybertruck/CHANGELOG.md).

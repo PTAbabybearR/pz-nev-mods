@@ -1,3 +1,8 @@
+-- Copyright (c) 2026 熊叔
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 -- NEV Lib: where the portable power station and the home charger are found.
 -- v1.0.3 (DESIGN 6.1 / 6.4, I-240, user 10-13): the power station is "the petrol can's
 -- stand-in, easy to find" (S2): every vanilla list with the empty petrol can gets the
